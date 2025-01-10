@@ -3,7 +3,7 @@ import { Card, Button, Icon, DataTable, Spinner } from "@shopify/polaris";
 import { CircleChevronDownIcon } from "@shopify/polaris-icons";
 import { useQuery, gql } from '@apollo/client';
 
-export const Accounts: React.FC = () => {
+export const Budgets: React.FC = () => {
     const GET_ACCOUNTS = gql`
         query GetAccounts {
             accounts {
@@ -24,13 +24,9 @@ export const Accounts: React.FC = () => {
 
     return (<>
         <Card>
-            <DataTable
-                columnContentTypes={["text", "numeric"]}
-                headings={["Account name", "Created"]}
-                rows={rows}>
-            </DataTable>
+            Budgets!
         </Card>
     </>);
 };
 
-export default Accounts;
+export default Budgets;

@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import App from "./App";
+import AppRouter from "./AppRouter";
 
 import { ApolloClient, InMemoryCache, ApolloProvider, gql, HttpLink } from '@apollo/client';
 
@@ -19,12 +19,12 @@ document.addEventListener("turbo:load", () => {
         uri: '/graphql',
         link,
         cache: new InMemoryCache(),
-        });
-    
+    });
+
     const root = createRoot(document.body.appendChild(document.createElement("div")));
     root.render(
         <ApolloProvider client={client}>
-            <App />
+            <AppRouter />
         </ApolloProvider>
     );
 });
