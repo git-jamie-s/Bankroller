@@ -1,24 +1,12 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
-
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+### Project Creation steps
+1. install rails
+2. run: `rails new Bankroller -d postgresql -j esbuild -c bootstrap`
+3. `cd Bankroller`
+4. Run `yarn add react react-dom react-router-dom`
+5. Run `bundle add graphql`
+6. yarn add @shopify/polaris @shopify/polaris-icons @apollo/client graphql
+7. `rails g controller Home index`
+8. 
+9. 
