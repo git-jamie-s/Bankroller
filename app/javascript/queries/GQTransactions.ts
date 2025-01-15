@@ -4,6 +4,7 @@ export function GQTransactions(order: string,
     accountId: string,
     query: string,
     categories: string[],
+    transactionTypes: string[],
     first: number = 10,
     last: number | undefined = undefined,
     after: string | undefined = undefined,
@@ -15,6 +16,7 @@ export function GQTransactions(order: string,
             $accountId: ID!
             $query: String
             $categories: [String!]
+            $transactionTypes: [String!]
             $order: String
             $first: Int
             $last: Int
@@ -25,6 +27,7 @@ export function GQTransactions(order: string,
                 accountId: $accountId
                 query: $query
                 categories: $categories
+                transactionTypes: $transactionTypes
                 order: $order
                 first: $first
                 last: $last
@@ -52,7 +55,7 @@ export function GQTransactions(order: string,
         }`;
 
     const { data, loading, error } = useQuery(GET_TRANSACTIONS, {
-        variables: { accountId, query, categories, order, first, last, after, before }
+        variables: { accountId, query, categories, transactionTypes, order, first, last, after, before }
     });
 
     const transactions = data?.transactions;

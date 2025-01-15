@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Text, EmptySearchResult, IndexTable, Spinner, Button } from "@shopify/polaris";
 import { FormatCAD } from "../../../helpers/Formatter";
 import { GQTransactions } from "../../../queries/GQTransactions";
-import { TransactionFilter } from "./TransactionFilter";
+import { TransactionFilter } from "./TransactionFilter/TransactionFilter";
 import { IndexTableHeading } from "@shopify/polaris/build/ts/src/components/IndexTable";
 import { NonEmptyArray } from "@shopify/polaris/build/ts/src/types";
 import { ArrowUpIcon, ArrowDownIcon } from '@shopify/polaris-icons';
@@ -14,10 +14,10 @@ interface Props {
 export const Transactions: React.FC<Props> = ({ account }) => {
     const accountId = account.id;
     const [sort, setSort] = useState('date desc, id desc');
-    console.log("Hi there");
 
     const [queryValue, setQueryValue] = useState('');
     const [categoryOptions, setCategoryOptions] = useState([] as string[]);
+    const [transactionTypes, setTransactionTypes] = useState([] as string[]);
 
     const emptyStateMarkup = (
         <EmptySearchResult
@@ -27,7 +27,11 @@ export const Transactions: React.FC<Props> = ({ account }) => {
         />
     );
 
-    const { transactions, loading, error } = GQTransactions(sort, accountId, queryValue, categoryOptions, 50);
+    const { transactions, loading, error } = GQTransactions(sort, accountId,
+        queryValue,
+        categoryOptions,
+        transactionTypes,
+        50);
     if (error) return <p>Error : {error.message}</p>;
     if (loading) return <Spinner />;
 
@@ -121,7 +125,9 @@ export const Transactions: React.FC<Props> = ({ account }) => {
                 query={queryValue}
                 setQuery={setQueryValue}
                 categoryOptions={categoryOptions}
-                setCategoryOptions={setCategoryOptions} />
+                setCategoryOptions={setCategoryOptions}
+                transactionTypes={transactionTypes}
+                setTransactionTypes={setTransactionTypes} />
             <IndexTable
                 resourceName={resourceName}
                 itemCount={200}
