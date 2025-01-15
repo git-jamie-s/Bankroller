@@ -4,7 +4,7 @@ module Types
   class TransactionType < Types::BaseObject
     field :id, ID, null: false
     field :account, Types::AccountType, null: false
-    
+
     field :amount, Integer, null: false
     field :balance, Integer, null: false
 

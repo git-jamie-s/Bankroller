@@ -40,6 +40,9 @@ export function GQTransactions(order: string,
                         category {
                             category
                         }
+                        account {
+                            accountName
+                        }
                         amount
                         balance
                     }

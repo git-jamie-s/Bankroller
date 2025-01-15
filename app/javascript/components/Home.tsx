@@ -4,7 +4,7 @@ import { BasePage } from "./BasePage";
 import { FolderIcon, ChartHistogramSecondLastIcon } from '@shopify/polaris-icons';
 import { Outlet } from "react-router-dom";
 import { useParams } from "react-router";
-import { GQAccount } from "../queries/Account";
+import { GQAccount } from "../queries/GQAccount";
 
 export const Home: React.FC = () => {
 

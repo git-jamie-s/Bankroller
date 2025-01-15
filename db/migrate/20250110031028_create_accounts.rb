@@ -35,7 +35,7 @@ class CreateAccounts < ActiveRecord::Migration[8.0]
       t.bigint "receipt_id"
       t.text "cheque_image_front"
     end
-  
+
     add_foreign_key "transactions", "account", name: "fk60ogq0ga4x4y0fkeu24tgm0kv"
     add_foreign_key "transactions", "category", name: "fkdv2mk0d5egsjapqkwcjgyw4ta"
   end

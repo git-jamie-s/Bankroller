@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { Text, EmptySearchResult, IndexTable, Spinner, IndexFiltersProps, IndexFilters, IndexFiltersMode, useSetIndexFiltersMode, Icon, Button } from "@shopify/polaris";
-import { useQuery, gql } from '@apollo/client';
+import { Text, EmptySearchResult, IndexTable, Spinner, Button } from "@shopify/polaris";
 import { FormatCAD } from "../../../helpers/Formatter";
 import { GQTransactions } from "../../../queries/GQTransactions";
 import { TransactionFilter } from "./TransactionFilter";
 import { IndexTableHeading } from "@shopify/polaris/build/ts/src/components/IndexTable";
 import { NonEmptyArray } from "@shopify/polaris/build/ts/src/types";
-import { CaretUpIcon, CaretDownIcon, ArrowUpIcon, ArrowDownIcon } from '@shopify/polaris-icons';
+import { ArrowUpIcon, ArrowDownIcon } from '@shopify/polaris-icons';
 
 interface Props {
     account: any;
@@ -15,6 +14,7 @@ interface Props {
 export const Transactions: React.FC<Props> = ({ account }) => {
     const accountId = account.id;
     const [sort, setSort] = useState('date desc, id desc');
+    console.log("Hi there");
 
     const [queryValue, setQueryValue] = useState('');
     const [categoryOptions, setCategoryOptions] = useState([] as string[]);
@@ -32,15 +32,28 @@ export const Transactions: React.FC<Props> = ({ account }) => {
     if (loading) return <Spinner />;
 
     const includeBalance = sort.startsWith("date");
+    const includeAccount = accountId === "0";
+    console.log("includeAccount: ", accountId, includeAccount);
 
     const rowMarkup = transactions.edges.map(
         (edge, index) => {
             const transaction = edge.node;
             const amount = FormatCAD(transaction.amount);
             const balance = FormatCAD(transaction.balance);
+            const accountCell = includeAccount && (
+                <IndexTable.Cell>{transaction.account.accountName}</IndexTable.Cell>
+            );
+            const balanceCell = includeBalance && (
+                <IndexTable.Cell>
+                    <Text as="span" alignment="end" numeric>
+                        {balance}
+                    </Text>
+                </IndexTable.Cell>
+            );
 
             return (
                 <IndexTable.Row id={transaction.id} key={transaction.id} position={index}>
+                    {accountCell}
                     <IndexTable.Cell>{transaction.date}</IndexTable.Cell>
                     <IndexTable.Cell>{transaction.transactionType}</IndexTable.Cell>
                     <IndexTable.Cell>{transaction.description}</IndexTable.Cell>
@@ -50,11 +63,7 @@ export const Transactions: React.FC<Props> = ({ account }) => {
                             {amount}
                         </Text>
                     </IndexTable.Cell>
-                    {includeBalance && (<IndexTable.Cell>
-                        <Text as="span" alignment="end" numeric>
-                            {balance}
-                        </Text>
-                    </IndexTable.Cell>)}
+                    {balanceCell}
                 </IndexTable.Row>
             )
         }
@@ -90,6 +99,10 @@ export const Transactions: React.FC<Props> = ({ account }) => {
         { id: 'category', title: titleButton("Category", "category") },
         { id: 'amount', title: titleButton("Amount", "amount") },
     ];
+
+    if (includeAccount) {
+        headings.unshift({ id: 'account', title: "Account" });
+    }
 
     if (includeBalance) {
         headings.push({
