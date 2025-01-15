@@ -21,9 +21,17 @@ module Types
     # Add root-level fields here.
     # They will be entry points for queries on your schema.
     field :accounts, [ Types::AccountType ], null: false, description: "List of accounts"
-
     def accounts
       Account.all
     end
+
+    field :categories, [ Types::CategoryType ], null: false, description: "List of all categories"
+    def categories
+      Category.all
+    end
+
+    field :account, Types::AccountType, null:true, description: "A specific account", resolver: Resolvers::AccountResolver
+
+    field :transactions, Types::TransactionType.connection_type, null:false, description: "A list of transactions", resolver: Resolvers::TransactionsResolver
   end
 end

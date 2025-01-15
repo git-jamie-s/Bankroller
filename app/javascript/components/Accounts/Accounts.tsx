@@ -1,6 +1,6 @@
 import React from "react";
-import { Card, Button, Icon, DataTable, Spinner } from "@shopify/polaris";
-import { CircleChevronDownIcon } from "@shopify/polaris-icons";
+import { Card, Text, Spinner, ResourceList, ResourceItem, Avatar, Icon } from "@shopify/polaris";
+import { BookOpenIcon } from "@shopify/polaris-icons";
 import { useQuery, gql } from '@apollo/client';
 
 export const Accounts: React.FC = () => {
@@ -9,26 +9,45 @@ export const Accounts: React.FC = () => {
             accounts {
                 id
                 accountName
-                createdAt
+                created
+                balance
             }
         }`;
 
     const { loading, error, data } = useQuery(GET_ACCOUNTS);
+    const CAD = new Intl.NumberFormat('en-CA', { style: "currency", currency: "CAD" });
 
     if (loading) return <Spinner />;
     if (error) return <p>Error : {error.message}</p>;
 
-    const rows = data.accounts.map((account) => {
-        return [account.accountName, account.createdAt];
-    });
+    function renderItem(account) {
+        const media = <Icon source={BookOpenIcon} />;
+        const balance = CAD.format(account.balance / 100);
+
+        return (
+            <ResourceItem
+                key={account.id}
+                id={account.id}
+                url={"/accounts/" + account.id}
+                media={media}
+                accessibilityLabel={`View details for account ${account.name}`}
+            >
+                <Text variant="bodyMd" fontWeight="bold" as="h3">
+                    {account.accountName}
+                </Text>
+                <>{balance}</>
+            </ResourceItem>
+        );
+    }
+    const accounts = data.accounts.map(item => ({ ...item }));
+    accounts.push({ id: "0", accountName: "all", balance: "" });
 
     return (<>
         <Card>
-            <DataTable
-                columnContentTypes={["text", "numeric"]}
-                headings={["Account name", "Created"]}
-                rows={rows}>
-            </DataTable>
+            <ResourceList
+                items={accounts}
+                renderItem={renderItem}
+            />
         </Card>
     </>);
 };
