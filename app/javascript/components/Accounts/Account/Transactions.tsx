@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Text, EmptySearchResult, IndexTable, Spinner, Button } from "@shopify/polaris";
 import { FormatCAD } from "../../../helpers/Formatter";
 import { GQTransactions } from "../../../queries/GQTransactions";
@@ -6,6 +6,8 @@ import { TransactionFilter } from "./TransactionFilter/TransactionFilter";
 import { IndexTableHeading } from "@shopify/polaris/build/ts/src/components/IndexTable";
 import { NonEmptyArray } from "@shopify/polaris/build/ts/src/types";
 import { ArrowUpIcon, ArrowDownIcon } from '@shopify/polaris-icons';
+import { PageInfo, PaginationQueryParams } from "../../../queries/PaginationType";
+import { useFilterState } from "../../../helpers/useFilterState";
 
 interface Props {
     account: any;
@@ -16,8 +18,25 @@ export const Transactions: React.FC<Props> = ({ account }) => {
     const [sort, setSort] = useState('date desc, id desc');
 
     const [queryValue, setQueryValue] = useState('');
-    const [categoryOptions, setCategoryOptions] = useState([] as string[]);
-    const [transactionTypes, setTransactionTypes] = useState([] as string[]);
+
+
+    const resetPagination = () => {
+        pageNumber.current = 1;
+        setPagination({ first: pageSize.current });
+    }
+
+    const categories = useFilterState<string[]>([], resetPagination);
+    const transactionTypes = useFilterState([] as string[], resetPagination);
+
+    const pageNumber = useRef<number>(1);
+    const pageSize = useRef<number>(50);
+    const [pagination, setPagination] = useState<PaginationQueryParams>({ first: pageSize.current });
+
+
+    const onSetQuery = (query) => {
+        resetPagination();
+        setQueryValue(query);
+    }
 
     const emptyStateMarkup = (
         <EmptySearchResult
@@ -29,17 +48,18 @@ export const Transactions: React.FC<Props> = ({ account }) => {
 
     const { transactions, loading, error } = GQTransactions(sort, accountId,
         queryValue,
-        categoryOptions,
-        transactionTypes,
-        50);
+        categories.current,
+        transactionTypes.current,
+        pagination);
     if (error) return <p>Error : {error.message}</p>;
-    if (loading) return <Spinner />;
+    // if (loading) return <Spinner />;
+
+    const pageInfo: PageInfo = transactions?.pageInfo || {}
 
     const includeBalance = sort.startsWith("date");
     const includeAccount = accountId === "0";
-    console.log("includeAccount: ", accountId, includeAccount);
 
-    const rowMarkup = transactions.edges.map(
+    const rowMarkup = transactions?.edges.map(
         (edge, index) => {
             const transaction = edge.node;
             const amount = FormatCAD(transaction.amount);
@@ -85,7 +105,6 @@ export const Transactions: React.FC<Props> = ({ account }) => {
 
         const newDesc = sameCol == desc ? "asc" : "desc";
         const newSortVal = `${sortVal} ${newDesc}, id ${newDesc}`;
-        console.log(newSortVal);
         setSort(newSortVal);
     }
 
@@ -119,21 +138,39 @@ export const Transactions: React.FC<Props> = ({ account }) => {
         } as IndexTableHeading);
     }
 
+    const pageCount = Math.ceil((transactions?.totalCount || 0) / pageSize.current);
+    const onNextPage = () => {
+        pageNumber.current++;
+        setPagination({ first: pageSize.current, after: pageInfo.endCursor || undefined })
+    }
+    const onPreviousPage = () => {
+        pageNumber.current--;
+        setPagination({ last: pageSize.current, before: pageInfo.startCursor || undefined })
+    }
+
+    const paginationInfo = {
+        hasNext: transactions?.pageInfo.hasNextPage,
+        hasPrevious: transactions?.pageInfo.hasPreviousPage,
+        onNext: onNextPage,
+        onPrevious: onPreviousPage,
+        type: "table",
+        label: `Page ${pageNumber.current} of ${pageCount}`
+    }
+
     return (
         <>
             <TransactionFilter
                 query={queryValue}
-                setQuery={setQueryValue}
-                categoryOptions={categoryOptions}
-                setCategoryOptions={setCategoryOptions}
-                transactionTypes={transactionTypes}
-                setTransactionTypes={setTransactionTypes} />
+                setQuery={onSetQuery}
+                categories={categories}
+                transactionTypes={transactionTypes} />
             <IndexTable
                 resourceName={resourceName}
                 itemCount={200}
                 selectable={false}
                 hasZebraStriping
                 headings={headings}
+                pagination={paginationInfo}
             >
                 {rowMarkup}
             </IndexTable >

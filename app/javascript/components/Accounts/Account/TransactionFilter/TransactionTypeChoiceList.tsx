@@ -2,14 +2,13 @@ import React from "react";
 import { ChoiceList } from '@shopify/polaris';
 import { useState } from 'react';
 import { GQTransactionTypes } from "../../../../queries/GQTransactionTypes";
-
+import { StateOption } from "../../../../helpers/useFilterState";
 
 interface Props {
-    transactionTypes: string[],
-    setTransactionTypes: (o: string[]) => void
+    transactionTypes: StateOption<string[]>
 };
 
-export const TransactionTypeChoiceList: React.FC<Props> = ({ transactionTypes, setTransactionTypes }) => {
+export const TransactionTypeChoiceList: React.FC<Props> = ({ transactionTypes }) => {
     const { transactionTypeData } = GQTransactionTypes();
     const data = transactionTypeData?.transactionTypes || [];
 
@@ -21,8 +20,8 @@ export const TransactionTypeChoiceList: React.FC<Props> = ({ transactionTypes, s
         <ChoiceList
             choices={choices}
             title="Types"
-            selected={transactionTypes}
-            onChange={setTransactionTypes}
+            selected={transactionTypes.current}
+            onChange={transactionTypes.setter}
             allowMultiple />
     );
 

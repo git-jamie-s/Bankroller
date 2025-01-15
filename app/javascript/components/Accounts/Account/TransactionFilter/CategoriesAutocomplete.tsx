@@ -2,14 +2,13 @@ import React from "react";
 import { LegacyStack, Tag, Autocomplete, Spinner } from '@shopify/polaris';
 import { useState, useCallback, useMemo } from 'react';
 import { GQCategories } from "../../../../queries/GQCategories";
-
+import { StateOption } from "../../../../helpers/useFilterState";
 
 interface Props {
-    selectedOptions: string[],
-    setSelectedOptions: (string) => void
+    categories: StateOption<string[]>
 };
 
-export const CategoriesAutocomplete: React.FC<Props> = ({ selectedOptions, setSelectedOptions }) => {
+export const CategoriesAutocomplete: React.FC<Props> = ({ categories }) => {
     const [inputValue, setInputValue] = useState('');
 
     const { categoriesData, loading } = GQCategories();
@@ -47,11 +46,13 @@ export const CategoriesAutocomplete: React.FC<Props> = ({ selectedOptions, setSe
         [deselectedOptions],
     );
 
+    const selectedOptions = categories.current;
+
     const removeTag = useCallback(
         (tag: string) => () => {
             const options = [...selectedOptions];
             options.splice(options.indexOf(tag), 1);
-            setSelectedOptions(options);
+            categories.setter(options);
         },
         [selectedOptions],
     );
@@ -91,7 +92,7 @@ export const CategoriesAutocomplete: React.FC<Props> = ({ selectedOptions, setSe
                 options={options}
                 selected={selectedOptions}
                 textField={textField}
-                onSelect={setSelectedOptions}
+                onSelect={categories.setter}
                 listTitle="Suggested Tags"
             />
         </div>

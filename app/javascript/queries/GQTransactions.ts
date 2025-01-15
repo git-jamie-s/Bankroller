@@ -1,16 +1,14 @@
 import { useQuery, gql } from '@apollo/client';
+import { PaginationQueryParams } from './PaginationType';
 
 export function GQTransactions(order: string,
     accountId: string,
     query: string,
     categories: string[],
     transactionTypes: string[],
-    first: number = 10,
-    last: number | undefined = undefined,
-    after: string | undefined = undefined,
-    before: string | undefined = undefined
+    pagination: PaginationQueryParams
 ) {
-    console.log("Category Options: ", categories);
+    console.log(pagination);
     const GET_TRANSACTIONS = gql`
         query GetTransactions(
             $accountId: ID!
@@ -51,11 +49,27 @@ export function GQTransactions(order: string,
                     }
                 }
                 totalCount
+                pageInfo {
+                    hasNextPage
+                    hasPreviousPage
+                    startCursor
+                    endCursor
+                }
             }
         }`;
 
     const { data, loading, error } = useQuery(GET_TRANSACTIONS, {
-        variables: { accountId, query, categories, transactionTypes, order, first, last, after, before }
+        variables: {
+            accountId,
+            query,
+            categories,
+            transactionTypes,
+            order,
+            first: pagination.first,
+            last: pagination.last,
+            after: pagination.after,
+            before: pagination.before
+        }
     });
 
     const transactions = data?.transactions;

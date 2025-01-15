@@ -4,19 +4,18 @@ import { AppliedFilterInterface, LegacyFilters } from "@shopify/polaris";
 import debounce from "lodash.debounce";
 import { CategoriesAutocomplete } from "./CategoriesAutocomplete";
 import { TransactionTypeChoiceList } from "./TransactionTypeChoiceList";
+import { StateOption } from "../../../../helpers/useFilterState";
 
 interface Props {
     query: string,
     setQuery: (string) => void,
-    categoryOptions: string[],
-    setCategoryOptions: (o: string[]) => void
-    transactionTypes: string[],
-    setTransactionTypes: (o: string[]) => void
+    categories: StateOption<string[]>,
+    transactionTypes: StateOption<string[]>,
 };
 
 const DEBOUNCE_TIME = 500;
 
-export const TransactionFilter: React.FC<Props> = ({ query, setQuery, categoryOptions, setCategoryOptions, transactionTypes, setTransactionTypes }) => {
+export const TransactionFilter: React.FC<Props> = ({ query, setQuery, categories, transactionTypes }) => {
     const [localQuery, setLocalQuery] = useState(query);
 
     const debouncedOnQueryChange = useRef<any>(
@@ -30,42 +29,38 @@ export const TransactionFilter: React.FC<Props> = ({ query, setQuery, categoryOp
 
     const onClearAll = () => {
         setLocalQuery("");
-        setCategoryOptions([]);
-        setTransactionTypes([]);
+        categories.setter([]);
+        transactionTypes.setter([]);
     }
 
     const filters = [
         {
             key: 'category',
             label: 'Category',
-            filter: <CategoriesAutocomplete
-                selectedOptions={categoryOptions}
-                setSelectedOptions={setCategoryOptions} />,
+            filter: <CategoriesAutocomplete categories={categories} />,
             shortcut: true,
         },
         {
             key: "transactionType",
             label: "Types",
-            filter: <TransactionTypeChoiceList
-                transactionTypes={transactionTypes}
-                setTransactionTypes={setTransactionTypes} />,
+            filter: <TransactionTypeChoiceList transactionTypes={transactionTypes} />,
             shortcut: true,
         }
     ];
 
     const appliedFilters: AppliedFilterInterface[] = [];
-    if (categoryOptions.length > 0) {
+    if (categories.current.length > 0) {
         appliedFilters.push({
             key: 'categories',
-            label: categoryOptions.map((val) => `${val}`).join(', '),
-            onRemove: () => { setCategoryOptions([]) },
+            label: categories.current.map((val) => `${val}`).join(', '),
+            onRemove: () => { categories.setter([]) },
         });
     }
-    if (transactionTypes.length > 0) {
+    if (transactionTypes.current.length > 0) {
         appliedFilters.push({
             key: 'transactionType',
-            label: transactionTypes.join(","),
-            onRemove: () => { setTransactionTypes([]) }
+            label: transactionTypes.current.join(","),
+            onRemove: () => { transactionTypes.setter([]) }
         });
     }
 
