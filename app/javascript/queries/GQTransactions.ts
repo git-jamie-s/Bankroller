@@ -1,20 +1,24 @@
 import { useQuery, gql } from '@apollo/client';
 import { PaginationQueryParams } from './PaginationType';
+import { AmountLimit } from '../components/Accounts/Account/TransactionFilter/AmountFilter';
 
 export function GQTransactions(order: string,
     accountId: string,
     query: string,
     categories: string[],
     transactionTypes: string[],
+    amountLimit: AmountLimit,
     pagination: PaginationQueryParams
 ) {
-    console.log(pagination);
     const GET_TRANSACTIONS = gql`
         query GetTransactions(
             $accountId: ID!
             $query: String
             $categories: [String!]
             $transactionTypes: [String!]
+            $minAmount: Int
+            $maxAmount: Int
+            $absAmount: Boolean!
             $order: String
             $first: Int
             $last: Int
@@ -26,6 +30,9 @@ export function GQTransactions(order: string,
                 query: $query
                 categories: $categories
                 transactionTypes: $transactionTypes
+                minAmount: $minAmount
+                maxAmount: $maxAmount
+                absAmount: $absAmount
                 order: $order
                 first: $first
                 last: $last
@@ -58,6 +65,9 @@ export function GQTransactions(order: string,
             }
         }`;
 
+    const minAmount = amountLimit.low ? amountLimit.low * 100 : undefined;
+    const maxAmount = amountLimit.high ? amountLimit.high * 100 : undefined;
+
     const { data, loading, error } = useQuery(GET_TRANSACTIONS, {
         variables: {
             accountId,
@@ -68,7 +78,10 @@ export function GQTransactions(order: string,
             first: pagination.first,
             last: pagination.last,
             after: pagination.after,
-            before: pagination.before
+            before: pagination.before,
+            minAmount,
+            maxAmount,
+            absAmount: amountLimit.abs
         }
     });
 

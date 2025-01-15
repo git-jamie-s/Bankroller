@@ -8,6 +8,7 @@ import { NonEmptyArray } from "@shopify/polaris/build/ts/src/types";
 import { ArrowUpIcon, ArrowDownIcon } from '@shopify/polaris-icons';
 import { PageInfo, PaginationQueryParams } from "../../../queries/PaginationType";
 import { useFilterState } from "../../../helpers/useFilterState";
+import { AmountLimit } from "./TransactionFilter/AmountFilter";
 
 interface Props {
     account: any;
@@ -27,6 +28,7 @@ export const Transactions: React.FC<Props> = ({ account }) => {
 
     const categories = useFilterState<string[]>([], resetPagination);
     const transactionTypes = useFilterState([] as string[], resetPagination);
+    const amountLimit = useFilterState<AmountLimit>({ low: undefined, high: undefined, abs: true });
 
     const pageNumber = useRef<number>(1);
     const pageSize = useRef<number>(50);
@@ -50,6 +52,7 @@ export const Transactions: React.FC<Props> = ({ account }) => {
         queryValue,
         categories.current,
         transactionTypes.current,
+        amountLimit.current,
         pagination);
     if (error) return <p>Error : {error.message}</p>;
     // if (loading) return <Spinner />;
@@ -163,7 +166,8 @@ export const Transactions: React.FC<Props> = ({ account }) => {
                 query={queryValue}
                 setQuery={onSetQuery}
                 categories={categories}
-                transactionTypes={transactionTypes} />
+                transactionTypes={transactionTypes}
+                amountLimit={amountLimit} />
             <IndexTable
                 resourceName={resourceName}
                 itemCount={200}

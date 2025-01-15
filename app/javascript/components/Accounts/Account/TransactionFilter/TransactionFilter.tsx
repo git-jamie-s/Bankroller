@@ -4,18 +4,21 @@ import { AppliedFilterInterface, LegacyFilters } from "@shopify/polaris";
 import debounce from "lodash.debounce";
 import { CategoriesAutocomplete } from "./CategoriesAutocomplete";
 import { TransactionTypeChoiceList } from "./TransactionTypeChoiceList";
-import { StateOption } from "../../../../helpers/useFilterState";
+import { StateOption, useFilterState } from "../../../../helpers/useFilterState";
+import { AmountFilter, AmountLimit } from "./AmountFilter";
+import { FormatCAD } from "../../../../helpers/Formatter";
 
 interface Props {
     query: string,
-    setQuery: (string) => void,
-    categories: StateOption<string[]>,
-    transactionTypes: StateOption<string[]>,
+    setQuery: (string) => void;
+    categories: StateOption<string[]>;
+    transactionTypes: StateOption<string[]>;
+    amountLimit: StateOption<AmountLimit>;
 };
 
 const DEBOUNCE_TIME = 500;
 
-export const TransactionFilter: React.FC<Props> = ({ query, setQuery, categories, transactionTypes }) => {
+export const TransactionFilter: React.FC<Props> = ({ query, setQuery, categories, transactionTypes, amountLimit }) => {
     const [localQuery, setLocalQuery] = useState(query);
 
     const debouncedOnQueryChange = useRef<any>(
@@ -45,6 +48,12 @@ export const TransactionFilter: React.FC<Props> = ({ query, setQuery, categories
             label: "Types",
             filter: <TransactionTypeChoiceList transactionTypes={transactionTypes} />,
             shortcut: true,
+        },
+        {
+            key: "amountFilter",
+            label: "Amount",
+            filter: <AmountFilter amountLimit={amountLimit} />,
+            shortcut: true
         }
     ];
 
@@ -61,6 +70,23 @@ export const TransactionFilter: React.FC<Props> = ({ query, setQuery, categories
             key: 'transactionType',
             label: transactionTypes.current.join(","),
             onRemove: () => { transactionTypes.setter([]) }
+        });
+    }
+    const alc = amountLimit.current;
+    if (alc.low !== undefined || alc.high !== undefined) {
+        const CAD = new Intl.NumberFormat('en-CA', { style: "currency", currency: "CAD" });
+
+        const labels: string[] = [];
+        if (alc.abs) labels.push("|");
+        labels.push(alc.low === undefined ? "" : CAD.format(alc.low));
+        labels.push(" .. ");
+        labels.push(alc.high === undefined ? "" : CAD.format(alc.high));
+        if (alc.abs) labels.push("|");
+
+        appliedFilters.push({
+            key: 'amountLimits',
+            label: labels.join(""),
+            onRemove: () => { amountLimit.setter({ abs: true }); }
         });
     }
 
