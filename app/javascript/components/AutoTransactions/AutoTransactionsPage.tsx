@@ -8,7 +8,7 @@ import { FormatCAD } from "../../helpers/Formatter";
 import { TransactionFilter } from "../Accounts/Account/TransactionFilter/TransactionFilter";
 import { useFilterState } from "../../helpers/useFilterState";
 import { AmountLimit } from "../Accounts/Account/TransactionFilter/AmountFilter";
-import { PaginationQueryParams } from "../../queries/PaginationType";
+import { PageInfo, PaginationQueryParams } from "../../queries/PaginationType";
 
 export const AutoTransactionsPage: React.FC = () => {
 
@@ -29,7 +29,6 @@ export const AutoTransactionsPage: React.FC = () => {
     const pageSize = useRef<number>(50);
     const [pagination, setPagination] = useState<PaginationQueryParams>({ first: pageSize.current });
 
-
     const { autoTransactions, loading, error } = GQAutoTransactions(
         sort,
         query.current,
@@ -43,7 +42,15 @@ export const AutoTransactionsPage: React.FC = () => {
         plural: 'import rules',
     };
 
-    const handleSortClick = (sortVal) => { }
+
+    const handleSortClick = (sortVal) => {
+        const sameCol = sort.startsWith(sortVal);
+
+        const newDesc = sameCol == desc ? "asc" : "desc";
+        const newSortVal = `${sortVal} ${newDesc}, id ${newDesc}`;
+        setSort(newSortVal);
+        resetPagination();
+    }
 
     const dirIcon = desc ? ArrowDownIcon : ArrowUpIcon;
     function titleButton(label: string, sortVal: string) {
@@ -100,6 +107,27 @@ export const AutoTransactionsPage: React.FC = () => {
         },
     ];
 
+    const pageInfo: PageInfo = autoTransactions?.pageInfo || {}
+    const pageCount = Math.ceil((autoTransactions?.totalCount || 0) / pageSize.current);
+    const onNextPage = () => {
+        pageNumber.current++;
+        setPagination({ first: pageSize.current, after: pageInfo.endCursor || undefined })
+    }
+    const onPreviousPage = () => {
+        pageNumber.current--;
+        setPagination({ last: pageSize.current, before: pageInfo.startCursor || undefined })
+    }
+
+    const paginationInfo = {
+        hasNext: autoTransactions?.pageInfo.hasNextPage,
+        hasPrevious: autoTransactions?.pageInfo.hasPreviousPage,
+        onNext: onNextPage,
+        onPrevious: onPreviousPage,
+        type: "table",
+        label: `Page ${pageNumber.current} of ${pageCount}`
+    }
+
+
     return (<>
         <Card>
             <Text as="h1">Import Rules</Text>
@@ -110,13 +138,16 @@ export const AutoTransactionsPage: React.FC = () => {
                 transactionTypes={transactionTypes}
                 amountLimit={amountLimit} />
             <IndexTable
-                resourceName={resourceName} headings={headings} itemCount={rowMarkup.length}
+                resourceName={resourceName}
+                headings={headings}
+                itemCount={array.length}
                 selectable
                 hasZebraStriping
                 loading={loading}
                 onSelectionChange={handleSelectionChange}
                 selectedItemsCount={selectedResources.length}
                 promotedBulkActions={promotedBulkActions}
+                pagination={paginationInfo}
             >
                 {rowMarkup}
             </IndexTable>

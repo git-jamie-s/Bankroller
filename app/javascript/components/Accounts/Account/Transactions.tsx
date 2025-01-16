@@ -102,6 +102,7 @@ export const Transactions: React.FC<Props> = ({ account }) => {
         const newDesc = sameCol == desc ? "asc" : "desc";
         const newSortVal = `${sortVal} ${newDesc}, id ${newDesc}`;
         setSort(newSortVal);
+        resetPagination();
     }
 
     const dirIcon = desc ? ArrowDownIcon : ArrowUpIcon;
