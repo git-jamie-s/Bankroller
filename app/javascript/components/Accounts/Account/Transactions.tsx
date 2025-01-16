@@ -84,7 +84,7 @@ export const Transactions: React.FC<Props> = ({ account }) => {
                     <IndexTable.Cell>{transaction.date}</IndexTable.Cell>
                     <IndexTable.Cell>{transaction.transactionType}</IndexTable.Cell>
                     <IndexTable.Cell>{transaction.description}</IndexTable.Cell>
-                    <IndexTable.Cell>{transaction.category?.category}</IndexTable.Cell>
+                    <IndexTable.Cell>{transaction.categoryId}</IndexTable.Cell>
                     <IndexTable.Cell>
                         <Text as="span" alignment="end" numeric>
                             {amount}
@@ -114,7 +114,12 @@ export const Transactions: React.FC<Props> = ({ account }) => {
     const dirIcon = desc ? ArrowDownIcon : ArrowUpIcon;
     function titleButton(label: string, sortVal: string) {
         const icon = (sort.startsWith(sortVal)) ? dirIcon : undefined;
-        return <Button variant="tertiary" fullWidth textAlign="left" icon={icon} onClick={() => handleSortClick(sortVal)}>{label}</Button>
+        return <Button variant="tertiary"
+            fullWidth
+            textAlign="left"
+            icon={icon}
+            onClick={() => handleSortClick(sortVal)}>{label}
+        </Button>;
     }
 
     const headings: NonEmptyArray<IndexTableHeading> = [
@@ -122,7 +127,7 @@ export const Transactions: React.FC<Props> = ({ account }) => {
         { id: 'type', title: titleButton("Type", "transaction_type") },
 
         { id: 'description', title: titleButton("Description", "description") },
-        { id: 'category', title: titleButton("Category", "category") },
+        { id: 'category', title: titleButton("Category", "category_id") },
         { id: 'amount', title: titleButton("Amount", "amount") },
     ];
 

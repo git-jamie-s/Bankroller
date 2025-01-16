@@ -1,6 +1,5 @@
 import React from "react";
 import { ChoiceList } from '@shopify/polaris';
-import { useState } from 'react';
 import { GQTransactionTypes } from "../../../../queries/GQTransactionTypes";
 import { StateOption } from "../../../../helpers/useFilterState";
 

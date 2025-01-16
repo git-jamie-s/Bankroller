@@ -2,9 +2,7 @@
 
 module Types
   class CategoryType < Types::BaseObject
-    field :id, ID, null: false
-
-    field :category, String, null: false
+    field :id, String, null: false
 
     field :budget_amount, Integer, null: true
     field :budget_period, Integer, null: true

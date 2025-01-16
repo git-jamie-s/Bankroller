@@ -1,6 +1,5 @@
 import React from "react";
-import { Card, Button, Icon, DataTable, Spinner } from "@shopify/polaris";
-import { useQuery, gql } from '@apollo/client';
+import { Card, Spinner } from "@shopify/polaris";
 import { useParams } from "react-router";
 import { Transactions } from "./Transactions";
 import { GQAccount } from "../../../queries/GQAccount";

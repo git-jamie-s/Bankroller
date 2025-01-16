@@ -4,9 +4,8 @@ import { AppliedFilterInterface, LegacyFilters } from "@shopify/polaris";
 import debounce from "lodash.debounce";
 import { CategoriesAutocomplete } from "./CategoriesAutocomplete";
 import { TransactionTypeChoiceList } from "./TransactionTypeChoiceList";
-import { StateOption, useFilterState } from "../../../../helpers/useFilterState";
+import { StateOption } from "../../../../helpers/useFilterState";
 import { AmountFilter, AmountLimit } from "./AmountFilter";
-import { FormatCAD } from "../../../../helpers/Formatter";
 
 interface Props {
     query: string,

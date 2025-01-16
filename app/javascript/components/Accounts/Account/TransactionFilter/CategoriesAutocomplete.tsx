@@ -15,7 +15,7 @@ export const CategoriesAutocomplete: React.FC<Props> = ({ categories }) => {
     const data = categoriesData?.categories || [];
 
     const deselectedOptions = data.map((c) => {
-        return { value: c.category, label: c.category };
+        return { value: c.id, label: c.id };
     })
     const [options, setOptions] = useState(deselectedOptions);
 

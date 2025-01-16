@@ -45,9 +45,7 @@ export function GQTransactions(order: string,
                         date
                         transactionType
                         description
-                        category {
-                            category
-                        }
+                        categoryId
                         account {
                             accountName
                         }

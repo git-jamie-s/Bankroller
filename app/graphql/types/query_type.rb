@@ -25,12 +25,17 @@ module Types
       Account.all
     end
 
+    field :account, Types::AccountType, null: true, description: "A specific account", resolver: Resolvers::AccountResolver
+
     field :categories, [ Types::CategoryType ], null: false, description: "List of all categories"
     def categories
       Category.all
     end
 
-    field :account, Types::AccountType, null: true, description: "A specific account", resolver: Resolvers::AccountResolver
+    field :autotransactions, [ Types::AutotransactionType ], null: false
+    def autotransactions
+      Autotransaction.all
+    end
 
     field :transactions, Types::TransactionType.connection_type, null: false, description: "A list of transactions", resolver: Resolvers::TransactionsResolver
 

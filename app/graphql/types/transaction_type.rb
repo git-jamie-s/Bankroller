@@ -19,8 +19,7 @@ module Types
     field :transaction_type, String, null: false
     field :notes, String, null: false
 
-    field :category, Types::CategoryType, null: true
-
+    field :category_id, String, null: true
     field :created, GraphQL::Types::ISO8601Date, null: false
   end
 end

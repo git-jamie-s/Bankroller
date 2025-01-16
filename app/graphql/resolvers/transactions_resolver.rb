@@ -49,15 +49,7 @@ module Resolvers
             end
 
             if categories.any?
-                transactions = transactions
-                    .joins(:category)
-                    .where(category: { category: categories })
-            end
-
-            if order.starts_with?("category")
-                transactions = transactions.joins(:category)
-
-                order = "category." + order
+                transactions = transactions.where(category_id: categories)
             end
 
             transactions.order(order)

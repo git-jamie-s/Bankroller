@@ -7,7 +7,6 @@ export function GQCategories() {
     query GetCategories {
         categories {
             id
-            category
             budgetAmount
             budgetPeriod
         }
