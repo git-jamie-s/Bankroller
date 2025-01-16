@@ -43,7 +43,8 @@ export const Home: React.FC = () => {
 
     return (<>
         <BasePage title="Bankroll">
-            <Card>{buttons}
+            <Card>
+                {buttons}
                 {currentThing()}
             </Card>
             <Outlet />
