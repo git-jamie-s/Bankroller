@@ -1,20 +1,10 @@
 import React from "react";
 import { Card, Text, Spinner, ResourceList, ResourceItem, Avatar, Icon } from "@shopify/polaris";
 import { BookOpenIcon } from "@shopify/polaris-icons";
-import { useQuery, gql } from '@apollo/client';
+import { GQAccounts } from "../../queries/GQAccounts";
 
 export const Accounts: React.FC = () => {
-    const GET_ACCOUNTS = gql`
-        query GetAccounts {
-            accounts {
-                id
-                accountName
-                created
-                balance
-            }
-        }`;
-
-    const { loading, error, data } = useQuery(GET_ACCOUNTS);
+    const { loading, error, accountsData } = GQAccounts();
     const CAD = new Intl.NumberFormat('en-CA', { style: "currency", currency: "CAD" });
 
     if (loading) return <Spinner />;
@@ -39,7 +29,7 @@ export const Accounts: React.FC = () => {
             </ResourceItem>
         );
     }
-    const accounts = data.accounts.map(item => ({ ...item }));
+    const accounts = accountsData.accounts.map(item => ({ ...item }));
     accounts.push({ id: "0", accountName: "all", balance: "" });
 
     return (<>
