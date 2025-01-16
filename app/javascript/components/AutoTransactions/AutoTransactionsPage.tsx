@@ -1,9 +1,9 @@
 import React, { useRef, useState } from "react";
-import { Card, Button, Text, IndexTable } from "@shopify/polaris";
+import { Card, Button, Text, IndexTable, useIndexResourceState } from "@shopify/polaris";
 import { GQAutoTransactions } from "../../queries/GQAutoTransactions";
 import { NonEmptyArray } from "@shopify/polaris/build/ts/src/types";
 import { IndexTableHeading } from "@shopify/polaris/build/ts/src/components/IndexTable";
-import { ArrowUpIcon, ArrowDownIcon } from '@shopify/polaris-icons';
+import { ArrowUpIcon, ArrowDownIcon, DeleteIcon } from '@shopify/polaris-icons';
 import { FormatCAD } from "../../helpers/Formatter";
 import { TransactionFilter } from "../Accounts/Account/TransactionFilter/TransactionFilter";
 import { useFilterState } from "../../helpers/useFilterState";
@@ -63,17 +63,22 @@ export const AutoTransactionsPage: React.FC = () => {
         { id: 'amount', title: titleButton("Matching amount", "amount") },
     ];
 
-    const array = autoTransactions?.edges || [];
-    console.log("Array length: ", array.length);
+    const array = autoTransactions?.edges.map((edge) => edge.node) || [];
+
+    const { selectedResources, allResourcesSelected, handleSelectionChange } =
+        useIndexResourceState(array);
 
     const rowMarkup = array.map(
-        (edge, index) => {
-            const autoTransaction = edge.node;
+        (autoTransaction, index) => {
 
             const amount = autoTransaction.amount && FormatCAD(autoTransaction.amount);
 
             return (
-                <IndexTable.Row id={autoTransaction.id} key={autoTransaction.id} position={index}>
+                <IndexTable.Row
+                    id={autoTransaction.id}
+                    key={autoTransaction.id}
+                    position={index}
+                    selected={selectedResources.includes(autoTransaction.id)}>
                     <IndexTable.Cell>{autoTransaction.description}</IndexTable.Cell>
                     <IndexTable.Cell>{autoTransaction.transactionType}</IndexTable.Cell>
                     <IndexTable.Cell>{autoTransaction.categoryId}</IndexTable.Cell>
@@ -82,8 +87,18 @@ export const AutoTransactionsPage: React.FC = () => {
             )
         }
     );
-    console.log(rowMarkup.length);
 
+    const buldDeleteTitle = selectedResources.length == 2 ?
+        "Delete selected rule" : "Delete selected rules";
+
+    const promotedBulkActions = [
+        {
+            icon: DeleteIcon,
+            destructive: true,
+            content: "Delete Selected Rules",
+            onAction: () => console.log('Todo: implement bulk delete'),
+        },
+    ];
 
     return (<>
         <Card>
@@ -99,6 +114,9 @@ export const AutoTransactionsPage: React.FC = () => {
                 selectable
                 hasZebraStriping
                 loading={loading}
+                onSelectionChange={handleSelectionChange}
+                selectedItemsCount={selectedResources.length}
+                promotedBulkActions={promotedBulkActions}
             >
                 {rowMarkup}
             </IndexTable>
