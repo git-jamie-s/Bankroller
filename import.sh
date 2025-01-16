@@ -20,11 +20,11 @@ FROM transaction LEFT OUTER JOIN category ON (transaction.category_id = category
 
 SELECT setval(pg_get_serial_sequence('transactions', 'id'), max(id)) FROM transactions;
 
-INSERT into autotransactions(id, amount, description, transaction_type, category_id, account_id)
+INSERT into auto_transactions(id, amount, description, transaction_type, category_id, account_id)
   SELECT autotransaction.id, amount, description, transaction_type, category.category, account_id
   FROM autotransaction LEFT OUTER JOIN category ON (autotransaction.category_id=category.id);
 
-SELECT setval(pg_get_serial_sequence('autotransactions', 'id'), max(id)) FROM autotransactions;
+SELECT setval(pg_get_serial_sequence('auto_transactions', 'id'), max(id)) FROM auto_transactions;
 COMMIT;
 BEGIN;
 DROP TABLE autotransaction CASCADE;

@@ -32,11 +32,7 @@ module Types
       Category.all
     end
 
-    field :autotransactions, [ Types::AutotransactionType ], null: false
-    def autotransactions
-      Autotransaction.all
-    end
-
+    field :auto_transactions, Types::AutoTransactionType.connection_type, null: false, resolver: Resolvers::AutoTransactionsResolver
     field :transactions, Types::TransactionType.connection_type, null: false, description: "A list of transactions", resolver: Resolvers::TransactionsResolver
 
     field :transaction_types, [ String ], null: false

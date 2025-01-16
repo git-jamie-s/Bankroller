@@ -8,8 +8,7 @@ import { StateOption } from "../../../../helpers/useFilterState";
 import { AmountFilter, AmountLimit } from "./AmountFilter";
 
 interface Props {
-    query: string,
-    setQuery: (string) => void;
+    query: StateOption<string>;
     categories: StateOption<string[]>;
     transactionTypes: StateOption<string[]>;
     amountLimit: StateOption<AmountLimit>;
@@ -17,11 +16,11 @@ interface Props {
 
 const DEBOUNCE_TIME = 500;
 
-export const TransactionFilter: React.FC<Props> = ({ query, setQuery, categories, transactionTypes, amountLimit }) => {
-    const [localQuery, setLocalQuery] = useState(query);
+export const TransactionFilter: React.FC<Props> = ({ query, categories, transactionTypes, amountLimit }) => {
+    const [localQuery, setLocalQuery] = useState(query.current);
 
     const debouncedOnQueryChange = useRef<any>(
-        debounce((nextValue) => { setQuery(nextValue) }, DEBOUNCE_TIME)
+        debounce((nextValue) => { query.setter(nextValue) }, DEBOUNCE_TIME)
     ).current;
 
     const onQueryChange = (q) => {
@@ -33,6 +32,7 @@ export const TransactionFilter: React.FC<Props> = ({ query, setQuery, categories
         setLocalQuery("");
         categories.setter([]);
         transactionTypes.setter([]);
+        amountLimit.setter({ abs: true });
     }
 
     const filters = [

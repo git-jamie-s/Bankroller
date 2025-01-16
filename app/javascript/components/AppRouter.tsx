@@ -6,7 +6,7 @@ import Accounts from './Accounts/Accounts';
 import AccountPage from './Accounts/Account/AccountPage';
 
 import Budgets from "./Budgets/Budgets";
-import ImportRulesPage from "./ImportRules/ImportRulesPage";
+import AutoTransactionsPage from "./AutoTransactions/AutoTransactionsPage";
 
 export default props => (
     <Router>
@@ -15,7 +15,7 @@ export default props => (
                 <Route path="accounts" element={<Accounts />}>
                 </Route>
                 <Route path="accounts/:account" element={<AccountPage />} />
-                <Route path="rules" element={<ImportRulesPage />} />
+                <Route path="rules" element={<AutoTransactionsPage />} />
                 <Route path="budgets" element={<Budgets />} />
             </Route>
         </Routes>

@@ -18,14 +18,12 @@ export const Transactions: React.FC<Props> = ({ account }) => {
     const accountId = account.id;
     const [sort, setSort] = useState('date desc, id desc');
 
-    const [queryValue, setQueryValue] = useState('');
-
-
     const resetPagination = () => {
         pageNumber.current = 1;
         setPagination({ first: pageSize.current });
     }
 
+    const query = useFilterState<string>('', resetPagination);
     const categories = useFilterState<string[]>([], resetPagination);
     const transactionTypes = useFilterState([] as string[], resetPagination);
     const amountLimit = useFilterState<AmountLimit>({ low: undefined, high: undefined, abs: true });
@@ -34,11 +32,6 @@ export const Transactions: React.FC<Props> = ({ account }) => {
     const pageSize = useRef<number>(50);
     const [pagination, setPagination] = useState<PaginationQueryParams>({ first: pageSize.current });
 
-
-    const onSetQuery = (query) => {
-        resetPagination();
-        setQueryValue(query);
-    }
 
     const emptyStateMarkup = (
         <EmptySearchResult
@@ -49,7 +42,7 @@ export const Transactions: React.FC<Props> = ({ account }) => {
     );
 
     const { transactions, loading, error } = GQTransactions(sort, accountId,
-        queryValue,
+        query.current,
         categories.current,
         transactionTypes.current,
         amountLimit.current,
@@ -168,8 +161,7 @@ export const Transactions: React.FC<Props> = ({ account }) => {
     return (
         <>
             <TransactionFilter
-                query={queryValue}
-                setQuery={onSetQuery}
+                query={query}
                 categories={categories}
                 transactionTypes={transactionTypes}
                 amountLimit={amountLimit} />

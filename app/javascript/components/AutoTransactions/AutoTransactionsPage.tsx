@@ -1,0 +1,109 @@
+import React, { useRef, useState } from "react";
+import { Card, Button, Text, IndexTable } from "@shopify/polaris";
+import { GQAutoTransactions } from "../../queries/GQAutoTransactions";
+import { NonEmptyArray } from "@shopify/polaris/build/ts/src/types";
+import { IndexTableHeading } from "@shopify/polaris/build/ts/src/components/IndexTable";
+import { ArrowUpIcon, ArrowDownIcon } from '@shopify/polaris-icons';
+import { FormatCAD } from "../../helpers/Formatter";
+import { TransactionFilter } from "../Accounts/Account/TransactionFilter/TransactionFilter";
+import { useFilterState } from "../../helpers/useFilterState";
+import { AmountLimit } from "../Accounts/Account/TransactionFilter/AmountFilter";
+import { PaginationQueryParams } from "../../queries/PaginationType";
+
+export const AutoTransactionsPage: React.FC = () => {
+
+    const [sort, setSort] = useState('description asc');
+    const desc = sort.includes(" desc");
+
+    const resetPagination = () => {
+        pageNumber.current = 1;
+        setPagination({ first: pageSize.current });
+    }
+
+    const query = useFilterState<string>('', resetPagination);
+    const categories = useFilterState<string[]>([], resetPagination);
+    const transactionTypes = useFilterState([] as string[], resetPagination);
+    const amountLimit = useFilterState<AmountLimit>({ low: undefined, high: undefined, abs: true });
+
+    const pageNumber = useRef<number>(1);
+    const pageSize = useRef<number>(50);
+    const [pagination, setPagination] = useState<PaginationQueryParams>({ first: pageSize.current });
+
+
+    const { autoTransactions, loading, error } = GQAutoTransactions(
+        sort,
+        query.current,
+        categories.current,
+        transactionTypes.current,
+        amountLimit.current,
+        pagination);
+
+    const resourceName = {
+        singular: 'import rule',
+        plural: 'import rules',
+    };
+
+    const handleSortClick = (sortVal) => { }
+
+    const dirIcon = desc ? ArrowDownIcon : ArrowUpIcon;
+    function titleButton(label: string, sortVal: string) {
+        const icon = (sort.startsWith(sortVal)) ? dirIcon : undefined;
+        return <Button variant="tertiary"
+            fullWidth
+            textAlign="left"
+            icon={icon}
+            onClick={() => handleSortClick(sortVal)}>{label}
+        </Button>;
+    }
+
+    const headings: NonEmptyArray<IndexTableHeading> = [
+        { id: 'description', title: titleButton("Matching Description", "description") },
+        { id: 'type', title: titleButton("Matching Type", "transaction_type") },
+        { id: 'category', title: titleButton("Matching category", "category_id") },
+        { id: 'amount', title: titleButton("Matching amount", "amount") },
+    ];
+
+    const array = autoTransactions?.edges || [];
+    console.log("Array length: ", array.length);
+
+    const rowMarkup = array.map(
+        (edge, index) => {
+            const autoTransaction = edge.node;
+
+            const amount = autoTransaction.amount && FormatCAD(autoTransaction.amount);
+
+            return (
+                <IndexTable.Row id={autoTransaction.id} key={autoTransaction.id} position={index}>
+                    <IndexTable.Cell>{autoTransaction.description}</IndexTable.Cell>
+                    <IndexTable.Cell>{autoTransaction.transactionType}</IndexTable.Cell>
+                    <IndexTable.Cell>{autoTransaction.categoryId}</IndexTable.Cell>
+                    <IndexTable.Cell>{amount}</IndexTable.Cell>
+                </IndexTable.Row>
+            )
+        }
+    );
+    console.log(rowMarkup.length);
+
+
+    return (<>
+        <Card>
+            <Text as="h1">Import Rules</Text>
+            <br />
+            <TransactionFilter
+                query={query}
+                categories={categories}
+                transactionTypes={transactionTypes}
+                amountLimit={amountLimit} />
+            <IndexTable
+                resourceName={resourceName} headings={headings} itemCount={rowMarkup.length}
+                selectable
+                hasZebraStriping
+                loading={loading}
+            >
+                {rowMarkup}
+            </IndexTable>
+        </Card>
+    </>);
+};
+
+export default AutoTransactionsPage;
