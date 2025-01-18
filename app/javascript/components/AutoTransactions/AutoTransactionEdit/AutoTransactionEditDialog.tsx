@@ -4,6 +4,7 @@ import { GQTransactionTypes } from "../../../graphql/GQTransactionTypes";
 import { GQCategories } from "../../../graphql/GQCategories";
 import { AutoTransactionEditCategory } from "./AutoTransactionEditCategory";
 import { useFilterState } from "../../../helpers/useFilterState";
+import { AutoTransactionEditAccount } from "./AutoTransactionEditAccount";
 
 interface Props {
     autoTransaction: any;
@@ -16,7 +17,6 @@ export const AutoTransactionEditDialog: React.FC<Props> = ({ autoTransaction, on
     // const autoTran = autoTransaction;
     const curAutoAmount = autoTransaction?.current.amount / 100.0;
     const curAutoAmountStr = curAutoAmount === 0 ? "" : curAutoAmount.toString();
-
     const [strAmount, setStrAmount] = useState<string>(curAutoAmountStr);
 
     const { transactionTypeData } = GQTransactionTypes();
@@ -25,11 +25,10 @@ export const AutoTransactionEditDialog: React.FC<Props> = ({ autoTransaction, on
         .filter((tt) => tt !== "LEDGER")
         .map((tt) => { return { label: tt, value: tt } }) || [];
 
-    ttOptions.unshift({ label: "- None -", value: "" })
+    ttOptions.unshift({ label: "(any)", value: "" })
 
     function setValue(value) {
         const newAutoTran = { ...autoTransaction.current, ...value };
-        console.log("Setting: ", newAutoTran);
         autoTransaction.setter(newAutoTran);
     }
 
@@ -65,6 +64,7 @@ export const AutoTransactionEditDialog: React.FC<Props> = ({ autoTransaction, on
                 onChange={onChangeAmount}
                 value={strAmount}
             />
+            <AutoTransactionEditAccount autoTransaction={autoTransaction} />
         </Card>
         <Card>
             <InlineStack align="center" gap="025">

@@ -24,9 +24,7 @@ export const AutoTransactionsList: React.FC<Props> = ({ loading, sorting, autoTr
     const [deleteAutoTransaction, { data: deleteData, error: deleteError }] = GMDeleteAutoTransaction();
     const [updateAutoTransaction, { data: updateData, error: updateError }] = GMUpdateAutoTransaction();
 
-    const deleteActive = useFilterState<boolean>(false);
-    const deleteText = deleteData?.deleteAutoTransaction.ok ? "Transaction deleted" : undefined;
-
+    const [toastMessage, setToastMessage] = useState<string | null>(null);
     const editingAutoTransaction = useFilterState<AutoTransactionType | null>(null);
 
     const handleSortClick = (sortVal) => {
@@ -54,20 +52,22 @@ export const AutoTransactionsList: React.FC<Props> = ({ loading, sorting, autoTr
         { id: 'type', title: titleButton("Matching Type", "transaction_type") },
         { id: 'category', title: titleButton("Matching category", "category_id") },
         { id: 'amount', title: titleButton("Matching amount", "amount") },
+        { id: 'account', title: titleButton("Account", "account.account_name") },
     ];
 
     const onDelete = (id) => {
-        console.log("Deleting autoTransaction", id);
-        deleteAutoTransaction({ variables: { id: id } });
-        deleteActive.setter(true);
+        deleteAutoTransaction({ variables: { id: id } })
+            .then(() => { setToastMessage("Rule deleted") })
+            .catch((e) => { setToastMessage(e.message); });
     };
     const onEdit = (autoTransaction) => {
-        console.log("Setting auto transaction");
         editingAutoTransaction.setter(autoTransaction);
     };
 
     const handleSave = () => {
         const changed: AutoTransactionType = editingAutoTransaction.current!;
+
+        console.log("New account", changed.account);
 
         const amount = changed.amount === 0 ? null : changed.amount;
         const input = {
@@ -76,16 +76,20 @@ export const AutoTransactionsList: React.FC<Props> = ({ loading, sorting, autoTr
             categoryId: changed.categoryId,
             amount: amount,
             transactionType: changed.transactionType,
-            accountId: changed.account?.id
+            accountId: changed.account?.id || null
         };
-        updateAutoTransaction({ variables: { autoTransaction: input } }).then(() => {
-            editingAutoTransaction.setter(null);
-        });
-    }
+        updateAutoTransaction({ variables: { autoTransaction: input } })
+            .then(() => {
+                editingAutoTransaction.setter(null);
+                setToastMessage("Saved");
+            })
+            .catch((e) => { setToastMessage(e.message) });
+    };
 
     const rowMarkup = array.map(
         (autoTransaction, index) => {
             const amount = autoTransaction.amount && FormatCAD(autoTransaction.amount);
+            const accountName = autoTransaction.account?.accountName;
             return (
                 <IndexTable.Row
                     id={autoTransaction.id}
@@ -99,14 +103,14 @@ export const AutoTransactionsList: React.FC<Props> = ({ loading, sorting, autoTr
                     <IndexTable.Cell>{autoTransaction.transactionType}</IndexTable.Cell>
                     <IndexTable.Cell>{autoTransaction.categoryId}</IndexTable.Cell>
                     <IndexTable.Cell>{amount}</IndexTable.Cell>
+                    <IndexTable.Cell>{accountName}</IndexTable.Cell>
                 </IndexTable.Row>
             )
         }
     );
 
-    const message = deleteError?.message || deleteText;
-    const toastMarkup = deleteActive.current && message ? (
-        <Toast content={message} onDismiss={() => { deleteActive.setter(false) }} duration={2000} />
+    const toastMarkup = toastMessage ? (
+        <Toast content={toastMessage} onDismiss={() => { setToastMessage(null) }} duration={2000} />
     ) : null;
 
     const editorMarkup = editingAutoTransaction.current &&

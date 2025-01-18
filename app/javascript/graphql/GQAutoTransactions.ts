@@ -45,6 +45,10 @@ export function GQAutoTransactions(
                         categoryId
                         transactionType
                         amount
+                        account {
+                            id
+                            accountName
+                        }
                     }
                 }
                 totalCount
