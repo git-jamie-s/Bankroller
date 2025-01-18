@@ -1,10 +1,14 @@
-import React, { } from "react";
-import { Button, IndexTable, useIndexResourceState } from "@shopify/polaris";
+import React, { useState } from "react";
+import { Button, Frame, IndexTable, Toast, useIndexResourceState } from "@shopify/polaris";
 import { NonEmptyArray } from "@shopify/polaris/build/ts/src/types";
 import { IndexTableHeading } from "@shopify/polaris/build/ts/src/components/IndexTable";
 import { ArrowUpIcon, ArrowDownIcon, DeleteIcon, EditIcon } from '@shopify/polaris-icons';
 import { FormatCAD } from "../../helpers/Formatter";
-import { StateOption } from "../../helpers/useFilterState";
+import { StateOption, useFilterState } from "../../helpers/useFilterState";
+import { GMDeleteAutoTransaction } from "../../graphql/GMDeleteAutoTransaction";
+import { AutoTransactionEditDialog } from "./AutoTransactionEdit/AutoTransactionEditDialog";
+import { GMUpdateAutoTransaction } from "../../graphql/GMUpdateAutoTransaction";
+import { AutoTransactionType } from "../../graphql/Types";
 
 interface Props {
     loading?: boolean;
@@ -16,6 +20,14 @@ interface Props {
 export const AutoTransactionsList: React.FC<Props> = ({ loading, sorting, autoTransactionArray, paginationInfo }) => {
     const desc = sorting.current.includes(" desc");
     const array = autoTransactionArray;
+
+    const [deleteAutoTransaction, { data: deleteData, error: deleteError }] = GMDeleteAutoTransaction();
+    const [updateAutoTransaction, { data: updateData, error: updateError }] = GMUpdateAutoTransaction();
+
+    const deleteActive = useFilterState<boolean>(false);
+    const deleteText = deleteData?.deleteAutoTransaction.ok ? "Transaction deleted" : undefined;
+
+    const editingAutoTransaction = useFilterState<AutoTransactionType | null>(null);
 
     const handleSortClick = (sortVal) => {
         const sameCol = sorting.current.startsWith(sortVal);
@@ -46,8 +58,30 @@ export const AutoTransactionsList: React.FC<Props> = ({ loading, sorting, autoTr
 
     const onDelete = (id) => {
         console.log("Deleting autoTransaction", id);
+        deleteAutoTransaction({ variables: { id: id } });
+        deleteActive.setter(true);
     };
-    const onEdit = (id) => { };
+    const onEdit = (autoTransaction) => {
+        console.log("Setting auto transaction");
+        editingAutoTransaction.setter(autoTransaction);
+    };
+
+    const handleSave = () => {
+        const changed: AutoTransactionType = editingAutoTransaction.current!;
+
+        const amount = changed.amount === 0 ? null : changed.amount;
+        const input = {
+            id: changed.id,
+            description: changed.description,
+            categoryId: changed.categoryId,
+            amount: amount,
+            transactionType: changed.transactionType,
+            accountId: changed.account?.id
+        };
+        updateAutoTransaction({ variables: { autoTransaction: input } }).then(() => {
+            editingAutoTransaction.setter(null);
+        });
+    }
 
     const rowMarkup = array.map(
         (autoTransaction, index) => {
@@ -59,7 +93,7 @@ export const AutoTransactionsList: React.FC<Props> = ({ loading, sorting, autoTr
                     position={index}>
                     <IndexTable.Cell>
                         <Button icon={DeleteIcon} onClick={() => onDelete(autoTransaction.id)} />
-                        <Button icon={EditIcon} onClick={() => onEdit(autoTransaction.id)} />
+                        <Button icon={EditIcon} onClick={() => onEdit(autoTransaction)} />
                     </IndexTable.Cell>
                     <IndexTable.Cell>{autoTransaction.description}</IndexTable.Cell>
                     <IndexTable.Cell>{autoTransaction.transactionType}</IndexTable.Cell>
@@ -70,17 +104,32 @@ export const AutoTransactionsList: React.FC<Props> = ({ loading, sorting, autoTr
         }
     );
 
+    const message = deleteError?.message || deleteText;
+    const toastMarkup = deleteActive.current && message ? (
+        <Toast content={message} onDismiss={() => { deleteActive.setter(false) }} duration={2000} />
+    ) : null;
+
+    const editorMarkup = editingAutoTransaction.current &&
+        <AutoTransactionEditDialog
+            autoTransaction={editingAutoTransaction}
+            onClose={() => editingAutoTransaction.setter(null)}
+            onSave={handleSave} />;
+
     return (
-        <IndexTable
-            headings={headings}
-            itemCount={array.length}
-            selectable={false}
-            hasZebraStriping
-            loading={loading}
-            pagination={paginationInfo}
-        >
-            {rowMarkup}
-        </IndexTable>
+        <Frame>
+            <IndexTable
+                headings={headings}
+                itemCount={array.length}
+                selectable={false}
+                hasZebraStriping
+                loading={loading}
+                pagination={paginationInfo}
+            >
+                {rowMarkup}
+            </IndexTable>
+            {toastMarkup}
+            {editorMarkup}
+        </Frame>
     );
 
 };

@@ -4,9 +4,9 @@ import { BasePage } from "./BasePage";
 import { FolderIcon, ChartHistogramSecondLastIcon } from '@shopify/polaris-icons';
 import { Outlet } from "react-router-dom";
 import { useParams } from "react-router";
-import { GQAccount } from "../queries/GQAccount";
+import { GQAccount } from "../graphql/GQAccount";
 import { ChevronDownIcon } from '@shopify/polaris-icons';
-import { GQAccounts } from "../queries/GQAccounts";
+import { GQAccounts } from "../graphql/GQAccounts";
 import { FormatCAD } from "../helpers/Formatter";
 
 export const Home: React.FC = () => {

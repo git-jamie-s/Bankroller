@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, Text, Spinner, ResourceList, ResourceItem, Avatar, Icon } from "@shopify/polaris";
 import { BookOpenIcon } from "@shopify/polaris-icons";
-import { GQAccounts } from "../../queries/GQAccounts";
+import { GQAccounts } from "../../graphql/GQAccounts";
 
 export const Accounts: React.FC = () => {
     const { loading, error, accountsData } = GQAccounts();

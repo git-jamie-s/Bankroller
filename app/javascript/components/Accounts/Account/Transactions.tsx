@@ -1,12 +1,12 @@
 import React, { useRef, useState } from "react";
-import { Text, EmptySearchResult, IndexTable, Spinner, Button } from "@shopify/polaris";
+import { Text, EmptySearchResult, IndexTable, Button } from "@shopify/polaris";
 import { FormatCAD } from "../../../helpers/Formatter";
-import { GQTransactions } from "../../../queries/GQTransactions";
+import { GQTransactions } from "../../../graphql/GQTransactions";
 import { TransactionFilter } from "./TransactionFilter/TransactionFilter";
 import { IndexTableHeading } from "@shopify/polaris/build/ts/src/components/IndexTable";
 import { NonEmptyArray } from "@shopify/polaris/build/ts/src/types";
 import { ArrowUpIcon, ArrowDownIcon } from '@shopify/polaris-icons';
-import { PageInfo, PaginationQueryParams } from "../../../queries/PaginationType";
+import { PageInfo, PaginationQueryParams } from "../../../graphql/PaginationType";
 import { useFilterState } from "../../../helpers/useFilterState";
 import { AmountLimit } from "./TransactionFilter/AmountFilter";
 
@@ -48,7 +48,6 @@ export const Transactions: React.FC<Props> = ({ account }) => {
         amountLimit.current,
         pagination);
     if (error) return <p>Error : {error.message}</p>;
-    // if (loading) return <Spinner />;
 
     const pageInfo: PageInfo = transactions?.pageInfo || {}
 

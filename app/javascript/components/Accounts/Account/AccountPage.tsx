@@ -2,7 +2,7 @@ import React from "react";
 import { Card, Spinner } from "@shopify/polaris";
 import { useParams } from "react-router";
 import { Transactions } from "./Transactions";
-import { GQAccount } from "../../../queries/GQAccount";
+import { GQAccount } from "../../../graphql/GQAccount";
 
 export const AccountPage: React.FC = () => {
     let params = useParams();

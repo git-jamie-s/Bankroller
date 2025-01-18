@@ -1,6 +1,6 @@
 import React from "react";
 import { ChoiceList } from '@shopify/polaris';
-import { GQTransactionTypes } from "../../../../queries/GQTransactionTypes";
+import { GQTransactionTypes } from "../../../../graphql/GQTransactionTypes";
 import { StateOption } from "../../../../helpers/useFilterState";
 
 interface Props {
