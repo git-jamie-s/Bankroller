@@ -16,23 +16,18 @@ class CreateAccounts < ActiveRecord::Migration[8.0]
       t.integer "budget_period"
     end
 
-    create_table "transactions", force: :cascade do |t|
+    create_table "transactions", id: :string, force: :cascade do |t|
       t.bigint "amount", null: false
       t.bigint "balance"
-      t.string "bank_transaction_id", limit: 255
       t.string "cheque_number", limit: 255
       t.date "date"
       t.string "description", limit: 255
-      t.boolean "is_read", null: false
       t.string "memo", limit: 255
       t.boolean "provisional", null: false
       t.string "transaction_type", limit: 255
       t.bigint "account_id", null: false
       t.string "category_id", null: true
-      t.bigint "transaction_pair_id"
       t.string "notes", default: "", null: false
-      t.bigint "receipt_id"
-      t.text "cheque_image_front"
     end
 
     create_table "auto_transactions", force: :cascade do |t|

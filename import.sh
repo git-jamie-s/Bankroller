@@ -10,15 +10,14 @@ SELECT setval(pg_get_serial_sequence('accounts', 'id'), max(id)) FROM accounts;
 INSERT into categories (id, budget_amount, budget_period)
     SELECT category, budget_amount, budget_period FROM category;
 
-INSERT into transactions(id, amount, balance, bank_transaction_id, cheque_number,
-    date, description, is_read, memo, provisional,
+INSERT into transactions(id, amount, balance, cheque_number,
+    date, description, memo, provisional,
     transaction_type, account_id, category_id, notes) 
-  SELECT transaction.id, transaction.amount, balance, bank_transaction_id, cheque_number,
-    date, description, is_read, memo, provisional,
+  SELECT transaction.bank_transaction_id, transaction.amount, balance, cheque_number,
+    date, description, memo, provisional,
     transaction_type, account_id, category.category, notes 
-FROM transaction LEFT OUTER JOIN category ON (transaction.category_id = category.id);
-
-SELECT setval(pg_get_serial_sequence('transactions', 'id'), max(id)) FROM transactions;
+FROM transaction LEFT OUTER JOIN category ON (transaction.category_id = category.id)
+WHERE transaction_type != "LEDGER";
 
 INSERT into auto_transactions(id, amount, description, transaction_type, category_id, account_id)
   SELECT autotransaction.id, amount, description, transaction_type, category.category, account_id

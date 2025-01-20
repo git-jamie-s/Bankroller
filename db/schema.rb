@@ -37,23 +37,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_10_031028) do
     t.integer "budget_period"
   end
 
-  create_table "transactions", force: :cascade do |t|
+  create_table "transactions", id: :string, force: :cascade do |t|
     t.bigint "amount", null: false
     t.bigint "balance"
-    t.string "bank_transaction_id", limit: 255
     t.string "cheque_number", limit: 255
     t.date "date"
     t.string "description", limit: 255
-    t.boolean "is_read", null: false
     t.string "memo", limit: 255
     t.boolean "provisional", null: false
     t.string "transaction_type", limit: 255
     t.bigint "account_id", null: false
     t.string "category_id"
-    t.bigint "transaction_pair_id"
     t.string "notes", default: "", null: false
-    t.bigint "receipt_id"
-    t.text "cheque_image_front"
   end
 
   add_foreign_key "auto_transactions", "accounts", name: "fkks6fwyv2qo7svlfn35872k9or"

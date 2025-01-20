@@ -8,4 +8,5 @@ Rails.application.routes.draw do
   get "/accounts/*", to: "home#index"
   get "/budgets", to: "home#index"
   get "/rules", to: "home#index"
+  post "/fileupload", to: "uploads#post"
 end

@@ -1,3 +1,11 @@
+GIT
+  remote: https://github.com/annacruz/ofx.git
+  revision: 543c18cc66aa408d89645c2150f32ca387af439d
+  ref: 543c18c
+  specs:
+    ofx (0.3.2)
+      nokogiri
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -317,6 +325,7 @@ DEPENDENCIES
   jbuilder
   jsbundling-rails
   kamal
+  ofx!
   pg (~> 1.1)
   propshaft
   puma (>= 5.0)

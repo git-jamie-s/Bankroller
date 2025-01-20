@@ -1,13 +1,13 @@
 import React from "react";
-import { Card, Button, Text, ButtonGroup, ActionList, Popover, LegacyStack } from "@shopify/polaris";
+import { Card, Button, Text, ButtonGroup, ActionList, Popover, InlineStack } from "@shopify/polaris";
 import { BasePage } from "./BasePage";
 import { FolderIcon, ChartHistogramSecondLastIcon } from '@shopify/polaris-icons';
 import { Outlet } from "react-router-dom";
 import { useParams } from "react-router";
-import { GQAccount } from "../graphql/GQAccount";
 import { ChevronDownIcon } from '@shopify/polaris-icons';
 import { GQAccounts } from "../graphql/GQAccounts";
 import { FormatCAD } from "../helpers/Formatter";
+import { UploadThing } from "./UploadThing";
 
 export const Home: React.FC = () => {
 
@@ -40,6 +40,12 @@ export const Home: React.FC = () => {
     if (actionListItems) {
         actionListItems.push({ content: "All", url: "/accounts/0" });
     }
+
+    const onUploadComplete = (accountId: number | null) => {
+        // Clear the GraphQL cache
+
+    };
+
     const buttons = (
         <ButtonGroup>
             <ButtonGroup variant="segmented">
@@ -51,7 +57,7 @@ export const Home: React.FC = () => {
                         <Button
                             onClick={toggleActive('popover2')}
                             icon={ChevronDownIcon}
-                            accessibilityLabel="Other save actions"
+                            accessibilityLabel="Account list"
                         />
                     }
                     autofocusTarget="first-node"
@@ -68,9 +74,10 @@ export const Home: React.FC = () => {
                     const url: string = section[2] as string;
                     const text: string = section[0] as string;
                     return (
-                        <Button icon={section[1]} url={url}>{text}</Button>);
+                        <Button size="large" icon={section[1]} url={url}>{text}</Button>);
                 })
             }
+            <UploadThing reload={onUploadComplete} />
         </ButtonGroup >
     );
 
@@ -82,10 +89,10 @@ export const Home: React.FC = () => {
             const accountData = accountsData.accounts.find((a) => a.id === accountId);
             return <>
                 <br />
-                <LegacyStack>
+                <InlineStack gap="200">
                     <Text as="h2" variant="headingSm">Account: {accountData.accountName}</Text>
                     {FormatCAD(accountData.balance)}
-                </LegacyStack>
+                </InlineStack>
             </>;
         }
         return null;
