@@ -1,10 +1,6 @@
 import React, { useRef, useState } from "react";
-import { Card, Button, Text, IndexTable, useIndexResourceState } from "@shopify/polaris";
+import { Card, Text } from "@shopify/polaris";
 import { GQAutoTransactions } from "../../graphql/GQAutoTransactions";
-import { NonEmptyArray } from "@shopify/polaris/build/ts/src/types";
-import { IndexTableHeading } from "@shopify/polaris/build/ts/src/components/IndexTable";
-import { ArrowUpIcon, ArrowDownIcon, DeleteIcon } from '@shopify/polaris-icons';
-import { FormatCAD } from "../../helpers/Formatter";
 import { TransactionFilter } from "../Accounts/Account/TransactionFilter/TransactionFilter";
 import { useFilterState } from "../../helpers/useFilterState";
 import { AmountLimit } from "../Accounts/Account/TransactionFilter/AmountFilter";
