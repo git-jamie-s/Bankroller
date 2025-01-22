@@ -2,7 +2,6 @@
 
 module Mutations
   class UpdateAutoTransaction < BaseMutation
-    
     field :ok, Boolean, null: false
 
     argument :auto_transaction, Types::AutoTransactionInput, required: true

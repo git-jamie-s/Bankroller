@@ -14,7 +14,7 @@ class AutoTransaction < ApplicationRecord
 
     def regex
         @regex ||= begin
-            escaped = Regexp.escape(description).gsub('\*','.*?')
+            escaped = Regexp.escape(description).gsub('\*', ".*?")
             puts "Created expression: #{escaped}"
             Regexp.new "^#{escaped}$", Regexp::IGNORECASE
         end

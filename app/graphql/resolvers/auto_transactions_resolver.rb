@@ -47,7 +47,7 @@ module Resolvers
                 auto_transactions = auto_transactions.where(category_id: categories)
             end
 
-            if (order.include?("account"))
+            if order.include?("account")
                 auto_transactions = auto_transactions.left_joins(:account)
             end
 

@@ -16,12 +16,11 @@ class UploadsController < ApplicationController
 
             Rails.logger.info("[Upload] Bank Account: #{ofx_account_bank_id} #{ofx_account_id}")
 
-            account = Account.find_by(bank_id: ofx_account_bank_id, bank_account_id: ofx_account_id)
-
-            if account.nil?
-                fail("unable to find bank account")
-                return
+            account = Account.find_or_create_by(bank_id: ofx_account_bank_id, bank_account_id: ofx_account_id) do |a|
+              a.account_name = ofx_account_id
+              a.created = Time.now()
             end
+            new_record = account.previously_new_record?
 
             trans = transactions(account)
             transaction_count = trans.size
@@ -39,10 +38,12 @@ class UploadsController < ApplicationController
                 status: "success",
                 account_id: account.id,
                 account_name: account.account_name,
+                account_new: new_record,
                 link: "/accounts/#{account.id}",
                 transactions: transaction_count,
                 categorized: cat_count,
-                saved: trans.count
+                saved: trans.count,
+                progress: 100
             }
             render(json: response.to_json)
         rescue => e

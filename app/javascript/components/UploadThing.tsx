@@ -1,16 +1,19 @@
 import React from "react";
-import { Card, DropZone, Link, List, Modal, Text } from '@shopify/polaris';
+import { Button, Card, DropZone, Link, List, Modal, ProgressBar, Text } from '@shopify/polaris';
 import { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom'
 
 interface UploadResponse {
     status: string;
     message?: string;
     account_id?: number;
     account_name?: string;
+    account_new?: boolean;
     link?: string;
     transactions?: number;
     categorized?: number;
     saved?: number;
+    progress: number;
 };
 
 interface Props {
@@ -21,6 +24,7 @@ export const UploadThing: React.FC<Props> = ({ reload }) => {
     const [file, setFile] = useState<File | null>(null);
     const [started, setStarted] = useState<boolean>(false);
     const [status, setStatus] = useState<UploadResponse | null>(null);
+    const navigate = useNavigate()
 
     const handleDropZoneDrop = useCallback(
         (_dropFiles: File[], acceptedFiles: File[], _rejectedFiles: File[]) =>
@@ -35,7 +39,7 @@ export const UploadThing: React.FC<Props> = ({ reload }) => {
 
         setStarted(true);
 
-        setStatus({ status: "Upload started", message: "" });
+        setStatus({ status: "Upload started", message: "", progress: 50 });
         setStatus(null);
 
         const formData = new FormData();
@@ -52,40 +56,38 @@ export const UploadThing: React.FC<Props> = ({ reload }) => {
                 setStatus(result as UploadResponse);
                 reload(result.account_id);
             } else {
-                setStatus({ status: data.statusText, message: `Upload of ${file.name} failed` });
+                setStatus({ status: data.statusText, message: `Upload of ${file.name} failed`, progress: 0 });
                 reload(null);
             }
         }).catch((e) => {
-            setStatus({ status: "Upload failed", message: e.message });
+            setStatus({ status: "Upload failed", message: e.message, progress: 0 });
         });
     }
 
     const onClose = () => {
+        console.log("CClose");
         setFile(null);
         setStarted(false);
     }
 
     console.log(status);
-    const success = () => {
+    const statusStuff = () => {
 
         if (status === null)
             return null;
 
         const listItems: any[] = [];
 
-        if (status.account_name && status.account_id) {
-            const url = `/accounts/${status.account_id}`;
-            listItems.push(
-                <List.Item>Account: <Link url={url}>{status.account_name}</Link></List.Item>
-            )
-        }
-
-
         if (status.transactions) {
             const skipped = status.transactions - status.saved!;
+            if (status.account_new === true) {
+                listItems.push(<List.Item>New Account Created: {status.account_name}</List.Item>);
+            } else {
+                listItems.push(<List.Item>Account: {status.account_name}</List.Item>);
+            }
             listItems.push(<List.Item>{status.transactions} transactions processed.</List.Item>);
-            listItems.push(<List.Item>{status.saved} transactions saved, {skipped} skipped</List.Item>)
-            listItems.push(<List.Item>{status.categorized} transactions categorized</List.Item>)
+            listItems.push(<List.Item>{status.saved} transactions saved, {skipped} skipped</List.Item>);
+            listItems.push(<List.Item>{status.categorized} transactions categorized</List.Item>);
         }
 
         return status && (
@@ -99,11 +101,23 @@ export const UploadThing: React.FC<Props> = ({ reload }) => {
         )
     };
 
+    const progress = status?.progress && <ProgressBar progress={status.progress} />;
+
+    const modalPrimary = {
+        content: 'Close',
+        onAction: () => {
+            reload(status?.account_id || null);
+            setFile(null);
+            setStarted(false);
+            navigate("/accounts/" + status?.account_id);
+        },
+    }
 
     const uploadModal = file &&
-        <Modal title="File Upload" open={true} onClose={onClose}>
+        <Modal title="File Upload" open={true} onClose={onClose} primaryAction={modalPrimary}>
             <Card>
-                {success()}
+                {progress}
+                {statusStuff()}
             </Card>
         </Modal >;
 

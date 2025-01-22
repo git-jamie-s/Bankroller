@@ -8,6 +8,7 @@ import { ChevronDownIcon } from '@shopify/polaris-icons';
 import { GQAccounts } from "../graphql/GQAccounts";
 import { FormatCAD } from "../helpers/Formatter";
 import { UploadThing } from "./UploadThing";
+import { useApolloClient } from '@apollo/client';
 
 export const Home: React.FC = () => {
 
@@ -23,6 +24,7 @@ export const Home: React.FC = () => {
     const params = useParams();
     const accountId = params.account;
     const [active, setActive] = React.useState<string | null>(null);
+    const apolloClient = useApolloClient();
 
     const { accountsData } = GQAccounts();
 
@@ -43,7 +45,8 @@ export const Home: React.FC = () => {
 
     const onUploadComplete = (accountId: number | null) => {
         // Clear the GraphQL cache
-
+        console.log("Clearing the cache of account data...");
+        apolloClient.resetStore();
     };
 
     const buttons = (
