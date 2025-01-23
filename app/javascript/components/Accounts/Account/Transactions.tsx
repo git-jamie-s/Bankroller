@@ -12,6 +12,7 @@ import { AmountLimit } from "./TransactionFilter/AmountFilter";
 import { TransactionCategory } from "./TransactionCategory";
 import { TransactionType } from "../../../graphql/Types";
 import { GMUpdateTransaction } from "../../../graphql/GMUpdateTransaction";
+import { TransactionDescription } from "./TransactionDescription";
 
 interface Props {
     account: any;
@@ -38,13 +39,14 @@ export const Transactions: React.FC<Props> = ({ account }) => {
 
     const onEditComplete = ((value) => {
         console.log("Saving transaction...", value);
-        const sliced = { id: value.id, categoryId: value.categoryId };
+        const sliced = { id: value.id, categoryId: value.categoryId, description: value.description };
         updateTransaction({ variables: { transaction: sliced } });
     });
 
-    const editingTransaction = useFilterState<TransactionType | null>(null, onEditComplete);
+    const editingTransactionCat = useFilterState<TransactionType | null>(null, onEditComplete);
+    const editingTransactionDesc = useFilterState<TransactionType | null>(null, onEditComplete);
 
-    const { transactions, loading, error } = GQTransactions(sort, accountId,
+    const { transactions, error } = GQTransactions(sort, accountId,
         query.current,
         categories.current,
         transactionTypes.current,
@@ -78,9 +80,11 @@ export const Transactions: React.FC<Props> = ({ account }) => {
                     {accountCell}
                     <IndexTable.Cell>{transaction.date}</IndexTable.Cell>
                     <IndexTable.Cell>{transaction.transactionType}</IndexTable.Cell>
-                    <IndexTable.Cell>{transaction.description}</IndexTable.Cell>
                     <IndexTable.Cell>
-                        <TransactionCategory transaction={transaction} editing={editingTransaction} /></IndexTable.Cell>
+                        <TransactionDescription transaction={transaction} editing={editingTransactionDesc} />
+                    </IndexTable.Cell>
+                    <IndexTable.Cell>
+                        <TransactionCategory transaction={transaction} editing={editingTransactionCat} /></IndexTable.Cell>
                     <IndexTable.Cell>
                         <Text as="span" alignment="end" numeric>
                             {amount}
@@ -171,7 +175,6 @@ export const Transactions: React.FC<Props> = ({ account }) => {
                 amountLimit={amountLimit} />
             <IndexTable
                 resourceName={resourceName}
-                loading={loading}
                 itemCount={200}
                 selectable={false}
                 hasZebraStriping
