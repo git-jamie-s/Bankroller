@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Text, EmptySearchResult, IndexTable, Button } from "@shopify/polaris";
+import { Text, IndexTable, Button } from "@shopify/polaris";
 import { FormatCAD } from "../../../helpers/Formatter";
 import { GQTransactions } from "../../../graphql/GQTransactions";
 import { TransactionFilter } from "./TransactionFilter/TransactionFilter";
@@ -9,6 +9,9 @@ import { ArrowUpIcon, ArrowDownIcon } from '@shopify/polaris-icons';
 import { PageInfo, PaginationQueryParams } from "../../../graphql/PaginationType";
 import { useFilterState } from "../../../helpers/useFilterState";
 import { AmountLimit } from "./TransactionFilter/AmountFilter";
+import { TransactionCategory } from "./TransactionCategory";
+import { TransactionType } from "../../../graphql/Types";
+import { GMUpdateTransaction } from "../../../graphql/GMUpdateTransaction";
 
 interface Props {
     account: any;
@@ -17,6 +20,7 @@ interface Props {
 export const Transactions: React.FC<Props> = ({ account }) => {
     const accountId = account.id;
     const [sort, setSort] = useState('date desc, id desc');
+    const [updateTransaction] = GMUpdateTransaction();
 
     const resetPagination = () => {
         pageNumber.current = 1;
@@ -32,14 +36,13 @@ export const Transactions: React.FC<Props> = ({ account }) => {
     const pageSize = useRef<number>(50);
     const [pagination, setPagination] = useState<PaginationQueryParams>({ first: pageSize.current });
 
+    const onEditComplete = ((value) => {
+        console.log("Saving transaction...", value);
+        const sliced = { id: value.id, categoryId: value.categoryId };
+        updateTransaction({ variables: { transaction: sliced } });
+    });
 
-    const emptyStateMarkup = (
-        <EmptySearchResult
-            title={'No transactions found'}
-            description={'Try changing the filters or search term'}
-            withIllustration
-        />
-    );
+    const editingTransaction = useFilterState<TransactionType | null>(null, onEditComplete);
 
     const { transactions, loading, error } = GQTransactions(sort, accountId,
         query.current,
@@ -76,7 +79,8 @@ export const Transactions: React.FC<Props> = ({ account }) => {
                     <IndexTable.Cell>{transaction.date}</IndexTable.Cell>
                     <IndexTable.Cell>{transaction.transactionType}</IndexTable.Cell>
                     <IndexTable.Cell>{transaction.description}</IndexTable.Cell>
-                    <IndexTable.Cell>{transaction.categoryId}</IndexTable.Cell>
+                    <IndexTable.Cell>
+                        <TransactionCategory transaction={transaction} editing={editingTransaction} /></IndexTable.Cell>
                     <IndexTable.Cell>
                         <Text as="span" alignment="end" numeric>
                             {amount}
@@ -167,6 +171,7 @@ export const Transactions: React.FC<Props> = ({ account }) => {
                 amountLimit={amountLimit} />
             <IndexTable
                 resourceName={resourceName}
+                loading={loading}
                 itemCount={200}
                 selectable={false}
                 hasZebraStriping

@@ -2,21 +2,23 @@ import React, { useCallback, useState } from "react"
 import { StateOption } from "../../../helpers/useFilterState";
 import { GQCategories } from "../../../graphql/GQCategories";
 import { Autocomplete } from "@shopify/polaris";
+import { AutoTransactionType, TransactionType } from "../../../graphql/Types";
 
 interface Props {
-    autoTransaction: StateOption<any>;
+    transaction: StateOption<AutoTransactionType | TransactionType>;
+    label?: string | null;
 }
 
-export const AutoTransactionEditCategory: React.FC<Props> = ({ autoTransaction }) => {
+export const TransactionEditCategory: React.FC<Props> = ({ transaction, label = "Category" }) => {
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
 
     const { categoriesData } = GQCategories();
     const catOptions = categoriesData?.categories.map((cat) => { return { label: cat.id, value: cat.id } }) || [];
-    const [options, setOptions] = useState(catOptions);
+    const [options, setOptions] = useState(catOptions.slice(0, 5));
 
     function setInputValue(value) {
-        const newAutoTran = { ...autoTransaction.current, categoryId: value };
-        autoTransaction.setter(newAutoTran);
+        const newAutoTran = { ...transaction.current, categoryId: value };
+        transaction.setter(newAutoTran);
     }
 
     const updateText = useCallback(
@@ -24,7 +26,7 @@ export const AutoTransactionEditCategory: React.FC<Props> = ({ autoTransaction }
             setInputValue(value);
 
             if (value === '') {
-                setOptions(catOptions);
+                setOptions(catOptions.slice(0, 5));
                 return;
             }
 
@@ -32,13 +34,14 @@ export const AutoTransactionEditCategory: React.FC<Props> = ({ autoTransaction }
             const resultOptions = catOptions.filter((option) =>
                 option.label.match(filterRegex),
             );
-            setOptions(resultOptions);
+            setOptions(resultOptions.slice(0, 5));
         },
         [catOptions],
     );
 
     const updateSelection = useCallback(
         (selected: string[]) => {
+            console.log("Selection: ", selected.join(","));
             const selectedValue = selected.map((selectedItem) => {
                 const matchedOption = options.find((option) => {
                     return option.value.match(selectedItem);
@@ -55,8 +58,8 @@ export const AutoTransactionEditCategory: React.FC<Props> = ({ autoTransaction }
     const textField = (
         <Autocomplete.TextField
             onChange={updateText}
-            label="Category"
-            value={autoTransaction.current.categoryId}
+            label={label}
+            value={transaction.current.categoryId}
             placeholder="gas, taxes, etc"
             autoComplete="off"
         />
@@ -68,6 +71,7 @@ export const AutoTransactionEditCategory: React.FC<Props> = ({ autoTransaction }
             selected={selectedOptions}
             onSelect={updateSelection}
             textField={textField}
+            preferredPosition="below"
         />
     );
 };

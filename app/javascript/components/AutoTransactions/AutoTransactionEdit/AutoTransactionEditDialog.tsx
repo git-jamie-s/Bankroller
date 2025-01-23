@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { BlockStack, Card, Text, Modal, Select, TextField, Autocomplete, Button, InlineStack } from '@shopify/polaris';
+import { Card, Modal, Select, TextField, Button, InlineStack } from '@shopify/polaris';
 import { GQTransactionTypes } from "../../../graphql/GQTransactionTypes";
-import { GQCategories } from "../../../graphql/GQCategories";
-import { AutoTransactionEditCategory } from "./AutoTransactionEditCategory";
-import { useFilterState } from "../../../helpers/useFilterState";
+import { TransactionEditCategory } from "./TransactionEditCategory";
+import { StateOption } from "../../../helpers/useFilterState";
 import { AutoTransactionEditAccount } from "./AutoTransactionEditAccount";
+import { AutoTransactionType } from "../../../graphql/Types";
 
 interface Props {
-    autoTransaction: any;
+    autoTransaction: StateOption<AutoTransactionType>;
     onClose: () => void;
     onSave: () => void;
 }
@@ -15,7 +15,7 @@ interface Props {
 export const AutoTransactionEditDialog: React.FC<Props> = ({ autoTransaction, onSave, onClose }) => {
 
     // const autoTran = autoTransaction;
-    const curAutoAmount = autoTransaction?.current.amount / 100.0;
+    const curAutoAmount = (autoTransaction.current?.amount || 0) / 100.0;
     const curAutoAmountStr = curAutoAmount === 0 ? "" : curAutoAmount.toString();
     const [strAmount, setStrAmount] = useState<string>(curAutoAmountStr);
 
@@ -56,7 +56,7 @@ export const AutoTransactionEditDialog: React.FC<Props> = ({ autoTransaction, on
                 value={autoTransaction.current.transactionType || ""}
                 onChange={onSetTransactionType}
             />
-            <AutoTransactionEditCategory autoTransaction={autoTransaction} />
+            <TransactionEditCategory transaction={autoTransaction} />
             <TextField
                 label="Amount"
                 type="currency"
