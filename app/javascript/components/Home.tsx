@@ -1,9 +1,10 @@
 import React from "react";
 import { Card, Button, Text, ButtonGroup, ActionList, Popover, InlineStack } from "@shopify/polaris";
 import { BasePage } from "./BasePage";
-import { FolderIcon, ChartHistogramSecondLastIcon } from '@shopify/polaris-icons';
+import { FolderIcon, ChartHistogramSecondLastIcon, NoteIcon, CalendarIcon, WalletIcon, CodeAddIcon } from '@shopify/polaris-icons';
 import { Outlet } from "react-router-dom";
 import { useParams } from "react-router";
+import { useLocation } from 'react-router-dom'
 import { ChevronDownIcon } from '@shopify/polaris-icons';
 import { GQAccounts } from "../graphql/GQAccounts";
 import { FormatCAD } from "../helpers/Formatter";
@@ -15,12 +16,13 @@ export const Home: React.FC = () => {
     const sections = [
         ["Reports", FolderIcon, "/reports"],
         ["Budgets", ChartHistogramSecondLastIcon, "/budgets"],
-        ["Summary", ChartHistogramSecondLastIcon, "/summary"],
-        ["Import Rules", ChartHistogramSecondLastIcon, "/rules"],
-        ["Schedule", ChartHistogramSecondLastIcon, "/schedule"],
-        ["Notes", ChartHistogramSecondLastIcon, "/notes"],
+        ["Summary", WalletIcon, "/summary"],
+        ["Import Rules", CodeAddIcon, "/rules"],
+        ["Schedule", CalendarIcon, "/schedule"],
+        ["Notes", NoteIcon, "/notes"],
     ];
 
+    const location = useLocation();
     const params = useParams();
     const accountId = params.account;
     const [active, setActive] = React.useState<string | null>(null);
@@ -49,18 +51,27 @@ export const Home: React.FC = () => {
         apolloClient.resetStore();
     };
 
+    const isAccountsPage = location.pathname.includes("accounts");
+
     const buttons = (
         <ButtonGroup>
             <ButtonGroup variant="segmented">
-                <Button url="/accounts" icon={FolderIcon}>Accounts</Button>
+                <Button size="large"
+                    url="/accounts"
+                    icon={FolderIcon}
+                    variant={isAccountsPage ? "primary" : "secondary"}>
+                    Accounts
+                </Button>
                 <Popover
                     active={active === 'popover2'}
                     preferredAlignment="right"
                     activator={
                         <Button
+                            size="large"
                             onClick={toggleActive('popover2')}
                             icon={ChevronDownIcon}
                             accessibilityLabel="Account list"
+                            variant={isAccountsPage ? "primary" : "secondary"}
                         />
                     }
                     autofocusTarget="first-node"
@@ -76,8 +87,9 @@ export const Home: React.FC = () => {
                 sections.map((section) => {
                     const url: string = section[2] as string;
                     const text: string = section[0] as string;
+                    const variant = location.pathname.includes(url) ? "primary" : "secondary";
                     return (
-                        <Button size="large" icon={section[1]} url={url}>{text}</Button>);
+                        <Button size="large" icon={section[1]} url={url} variant={variant}>{text}</Button>);
                 })
             }
             <UploadThing reload={onUploadComplete} />

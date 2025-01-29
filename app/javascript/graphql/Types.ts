@@ -33,12 +33,12 @@ export interface TransactionType {
     amount: number;
     balance: number;
 
-    bank_transaction_id: string;
-    cheque_number?: string;
+    bankTransactionId: string;
+    chequeNumber?: string;
     date: Date;
     description?: string;
     memo?: string;
-    transaction_type: string;
+    transactionType: string;
     notes: string
     categoryId?: string;
     created: Date;

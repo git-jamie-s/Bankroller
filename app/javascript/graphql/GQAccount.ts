@@ -1,5 +1,6 @@
 
 import { useQuery, gql } from '@apollo/client';
+import { AccountType } from './Types';
 
 export function GQAccount(accountId) {
 

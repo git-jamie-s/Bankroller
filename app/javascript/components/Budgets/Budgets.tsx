@@ -5,11 +5,11 @@ import { useQuery, gql } from '@apollo/client';
 
 export const Budgets: React.FC = () => {
     const GET_ACCOUNTS = gql`
-        query GetAccounts {
+        query GetAccounts { 
             accounts {
                 id
                 accountName
-                createdAt
+                created
             }
         }`;
 
