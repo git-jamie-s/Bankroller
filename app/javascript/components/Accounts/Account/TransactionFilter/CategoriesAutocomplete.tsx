@@ -3,6 +3,7 @@ import { LegacyStack, Tag, Autocomplete, Spinner, BlockStack } from '@shopify/po
 import { useState, useCallback, useMemo } from 'react';
 import { GQCategories } from "../../../../graphql/GQCategories";
 import { StateOption } from "../../../../helpers/useFilterState";
+import { CategoryType } from "../../../../graphql/Types";
 
 interface Props {
     categories: StateOption<string[]>
@@ -14,10 +15,10 @@ export const CategoriesAutocomplete: React.FC<Props> = ({ categories }) => {
     const { categoriesData, loading } = GQCategories();
     const data = categoriesData?.categories || [];
 
-    const deselectedOptions = data.map((c) => {
+    const allOptions = data.map((c: CategoryType) => {
         return { value: c.id, label: c.id };
     })
-    const [options, setOptions] = useState(deselectedOptions);
+    const [options, setOptions] = useState(allOptions);
 
     function titleCase(string: string) {
         return string
@@ -32,18 +33,18 @@ export const CategoriesAutocomplete: React.FC<Props> = ({ categories }) => {
             setInputValue(value);
 
             if (value === '') {
-                setOptions(deselectedOptions);
+                setOptions(allOptions);
                 return;
             }
 
             const filterRegex = new RegExp(value, 'i');
-            const resultOptions = deselectedOptions.filter((option) =>
+            const resultOptions = allOptions.filter((option) =>
                 option.label.match(filterRegex),
             );
 
             setOptions(resultOptions);
         },
-        [deselectedOptions],
+        [allOptions],
     );
 
     const selectedOptions = categories.current;
@@ -76,7 +77,7 @@ export const CategoriesAutocomplete: React.FC<Props> = ({ categories }) => {
     const textField = (
         <Autocomplete.TextField
             onChange={updateText}
-            label="Tags"
+            label="Categories"
             value={inputValue}
             placeholder="gas, insurance, cleaning..."
             verticalContent={verticalContentMarkup}
