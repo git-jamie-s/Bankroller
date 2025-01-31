@@ -65,6 +65,11 @@ export const TransactionCategory: React.FC<Props> = ({ index, editing, transacti
         [options],
     );
 
+    const onBlur = () => {
+        console.log("Blurring....", text);
+        editing.setter({ ...editing.current, categoryId: text });
+    };
+
     const optionsMarkup =
         options.length > 0
             ? options.map((option) => {
@@ -101,6 +106,7 @@ export const TransactionCategory: React.FC<Props> = ({ index, editing, transacti
                     prefix={<Icon source={SearchIcon} />}
                     onChange={updateText}
                     onClearButtonClick={() => updateText("")}
+                    onBlur={onBlur}
                     label="Category"
                     labelHidden
                     value={text}

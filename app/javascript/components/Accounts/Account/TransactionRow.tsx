@@ -1,13 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { Text, IndexTable, Button, Popover, ActionList } from "@shopify/polaris";
 import { FormatCAD } from "../../../helpers/Formatter";
-import { AutoTransactionType, TransactionType } from "../../../graphql/Types";
+import { TransactionType } from "../../../graphql/Types";
 import { TransactionDescription } from "./TransactionDescription";
 import { TransactionCategory } from "./TransactionCategory";
-import { StateOption, useFilterState } from "../../../helpers/useFilterState";
+import { StateOption } from "../../../helpers/useFilterState";
 import { ChevronDownIcon } from "@shopify/polaris-icons";
-import { AutoTransactionEditDialog } from "../../AutoTransactions/AutoTransactionEdit/AutoTransactionEditDialog";
-import { GMUpsertAutoTransaction } from "../../../graphql/GMUpsertAutoTransaction";
 
 interface Props {
     index: number;
