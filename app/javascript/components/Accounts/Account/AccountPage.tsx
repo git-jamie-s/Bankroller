@@ -7,7 +7,6 @@ import { GQAccount } from "../../../graphql/GQAccount";
 export const AccountPage: React.FC = () => {
     let params = useParams();
     const accountId = params.account
-    console.log("Account ID", accountId);
 
     const { accountData, loading, error } = GQAccount(accountId);
 

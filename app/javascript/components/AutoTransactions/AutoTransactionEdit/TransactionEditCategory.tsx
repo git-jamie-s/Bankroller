@@ -41,7 +41,6 @@ export const TransactionEditCategory: React.FC<Props> = ({ transaction, label = 
 
     const updateSelection = useCallback(
         (selected: string[]) => {
-            console.log("Selection: ", selected.join(","));
             const selectedValue = selected.map((selectedItem) => {
                 const matchedOption = options.find((option) => {
                     return option.value.match(selectedItem);

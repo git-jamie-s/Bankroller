@@ -46,8 +46,6 @@ export const Home: React.FC = () => {
     }
 
     const onUploadComplete = (accountId: number | null) => {
-        // Clear the GraphQL cache
-        console.log("Clearing the cache of account data...");
         apolloClient.resetStore();
     };
 

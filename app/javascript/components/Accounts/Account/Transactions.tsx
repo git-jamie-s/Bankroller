@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Text, IndexTable, Button } from "@shopify/polaris";
+import { Text, IndexTable, Button, Toast, Frame } from "@shopify/polaris";
 import { GQTransactions } from "../../../graphql/GQTransactions";
 import { TransactionFilter } from "./TransactionFilter/TransactionFilter";
 import { IndexTableHeading } from "@shopify/polaris/build/ts/src/components/IndexTable";
@@ -8,9 +8,11 @@ import { ArrowUpIcon, ArrowDownIcon } from '@shopify/polaris-icons';
 import { PageInfo, PaginationQueryParams } from "../../../graphql/PaginationType";
 import { useFilterState } from "../../../helpers/useFilterState";
 import { AmountLimit } from "./TransactionFilter/AmountFilter";
-import { TransactionType } from "../../../graphql/Types";
+import { AutoTransactionType, TransactionType } from "../../../graphql/Types";
 import { GMUpdateTransaction } from "../../../graphql/GMUpdateTransaction";
 import { TransactionRow } from "./TransactionRow";
+import { GMUpsertAutoTransaction } from "../../../graphql/GMUpsertAutoTransaction";
+import { AutoTransactionEditDialog } from "../../AutoTransactions/AutoTransactionEdit/AutoTransactionEditDialog";
 
 interface Props {
     account: any;
@@ -20,6 +22,42 @@ export const Transactions: React.FC<Props> = ({ account }) => {
     const accountId = account.id;
     const [sort, setSort] = useState('date desc, id desc');
     const [updateTransaction] = GMUpdateTransaction();
+    const [upsertAutoTransaction, { data: updateData, error: updateError }] = GMUpsertAutoTransaction();
+    const [toastMessage, setToastMessage] = useState<string | null>(null);
+    const createRule = useFilterState<AutoTransactionType | null>(null);
+
+    const onCreateRule = (transaction) => {
+        const autoTransaction: AutoTransactionType = {
+            id: "",
+            amount: transaction.amount,
+            description: transaction.description!,
+            transactionType: transaction.transactionType,
+            categoryId: transaction.categoryId!,
+            account: transaction.account
+        };
+        createRule.setter(autoTransaction);
+    };
+    const onSaveNewRule = (apply) => {
+        const changed: AutoTransactionType = createRule.current!;
+
+        const amount = changed.amount === 0 ? null : changed.amount;
+        const input = {
+            id: null,
+            description: changed.description,
+            categoryId: changed.categoryId,
+            amount: amount,
+            transactionType: changed.transactionType,
+            accountId: changed.account?.id || null
+        };
+
+        upsertAutoTransaction({ variables: { autoTransaction: input, apply: apply } })
+            .then(() => {
+                setToastMessage("New Rule Saved.");
+                createRule.setter(null);
+            })
+            .catch((e) => { setToastMessage(e.message) });
+    };
+
 
     const resetPagination = () => {
         pageNumber.current = 1;
@@ -37,7 +75,6 @@ export const Transactions: React.FC<Props> = ({ account }) => {
 
     const onEditComplete = ((value) => {
         if (value) {
-            console.log("Saving transaction...", value);
             const sliced = { id: value.id, categoryId: value.categoryId, description: value.description };
             updateTransaction({ variables: { transaction: sliced } });
         }
@@ -69,7 +106,8 @@ export const Transactions: React.FC<Props> = ({ account }) => {
                 includeAccount={includeAccount}
                 includeBalance={includeBalance}
                 editingDescription={editingTransactionDesc}
-                editingCategory={editingTransactionCat} />;
+                editingCategory={editingTransactionCat}
+                onCreateRule={onCreateRule} />;
         }
     );
 
@@ -103,7 +141,6 @@ export const Transactions: React.FC<Props> = ({ account }) => {
     const headings: NonEmptyArray<IndexTableHeading> = [
         { id: 'date', title: titleButton("Date", "date") },
         { id: 'type', title: titleButton("Type", "transaction_type") },
-
         { id: 'description', title: titleButton("Description", "description") },
         { id: 'category', title: titleButton("Category", "category_id") },
         { id: 'amount', title: titleButton("Amount", "amount") },
@@ -112,6 +149,7 @@ export const Transactions: React.FC<Props> = ({ account }) => {
     if (includeAccount) {
         headings.unshift({ id: 'account', title: "Account" });
     }
+    headings.unshift({ id: 'actions', title: "" });
 
     if (includeBalance) {
         headings.push({
@@ -143,8 +181,12 @@ export const Transactions: React.FC<Props> = ({ account }) => {
         label: `Page ${pageNumber.current} of ${pageCount}`
     }
 
+    const toastMarkup = toastMessage ? (
+        <Toast content={toastMessage} onDismiss={() => { setToastMessage(null) }} duration={2000} />
+    ) : null;
+
     return (
-        <>
+        <Frame>
             <TransactionFilter
                 query={query}
                 categories={categories}
@@ -160,7 +202,13 @@ export const Transactions: React.FC<Props> = ({ account }) => {
             >
                 {rowMarkup}
             </IndexTable >
-        </>
+            <AutoTransactionEditDialog
+                autoTransaction={createRule}
+                onClose={() => { createRule.setter(null) }}
+                onSave={onSaveNewRule}
+            />
+            {toastMarkup}
+        </Frame>
     );
 };
 

@@ -16,8 +16,8 @@ INSERT into transactions(id, amount, balance, cheque_number,
   SELECT transaction.bank_transaction_id, transaction.amount, balance, cheque_number,
     date, description, memo, provisional,
     transaction_type, account_id, category.category, notes 
-FROM transaction LEFT OUTER JOIN category ON (transaction.category_id = category.id)
-WHERE transaction_type != "LEDGER";
+  FROM transaction LEFT OUTER JOIN category ON (transaction.category_id = category.id)
+  WHERE transaction_type != 'LEDGER';
 
 INSERT into auto_transactions(id, amount, description, transaction_type, category_id, account_id)
   SELECT autotransaction.id, amount, description, transaction_type, category.category, account_id

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Checkbox, LegacyStack, TextField } from '@shopify/polaris';
+import { BlockStack, Checkbox, LegacyStack, TextField } from '@shopify/polaris';
 import { StateOption } from "../../../../helpers/useFilterState";
 import debounce from "lodash.debounce";
 
@@ -56,7 +56,7 @@ export const AmountFilter: React.FC<Props> = ({ amountLimit }) => {
     const localHigh = locals.high?.toString() || "";
 
     return (
-        <LegacyStack vertical>
+        <BlockStack>
             <TextField label="Minimum value"
                 type="number"
                 value={localLow}
@@ -70,7 +70,7 @@ export const AmountFilter: React.FC<Props> = ({ amountLimit }) => {
                 onChange={setLocalHighDebounce}
             />
             <Checkbox label="ABS" checked={locals.abs} onChange={changeAbs} />
-        </LegacyStack>
+        </BlockStack>
     );
 
 }

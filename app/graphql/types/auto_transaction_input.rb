@@ -2,7 +2,7 @@
 
 module Types
   class AutoTransactionInput < Types::BaseInputObject
-    argument :id, ID
+    argument :id, ID, required: false
     argument :account_id, ID, required: false
     argument :category_id, String
     argument :transaction_type, String, required: false

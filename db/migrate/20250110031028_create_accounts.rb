@@ -31,11 +31,12 @@ class CreateAccounts < ActiveRecord::Migration[8.0]
     end
 
     create_table "auto_transactions", force: :cascade do |t|
-      t.bigint "amount"
       t.string "description", null: false
-      t.string "transaction_type"
       t.string "category_id", null: false
       t.bigint "account_id"
+      t.string "transaction_type"
+      t.bigint "amount"
+      t.index [ "description", "category_id", "account_id", "transaction_type", "amount" ], name: "auto_all_unique", unique: true, nulls_not_distinct: true
     end
 
     add_foreign_key "transactions", "accounts", name: "fk60ogq0ga4x4y0fkeu24tgm0kv"

@@ -24,7 +24,7 @@ export const AutoTransactionsPage: React.FC = () => {
     const pageSize = useRef<number>(50);
     const [pagination, setPagination] = useState<PaginationQueryParams>({ first: pageSize.current });
 
-    const { autoTransactions, loading, error } = GQAutoTransactions(
+    const { autoTransactions, loading } = GQAutoTransactions(
         sorting.current,
         query.current,
         categories.current,

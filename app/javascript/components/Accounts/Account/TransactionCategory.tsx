@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useEffect } from "react"
 import { TransactionType } from "../../../graphql/Types";
-import { ActionList, Button, ButtonGroup, Combobox, Icon, InlineStack, Listbox, Popover } from "@shopify/polaris";
-import { SearchIcon, ChevronDownIcon } from "@shopify/polaris-icons";
+import { Button, Combobox, Icon, Listbox } from "@shopify/polaris";
+import { SearchIcon } from "@shopify/polaris-icons";
 import { GQCategories } from "../../../graphql/GQCategories";
 import { StateOption } from "../../../helpers/useFilterState";
 
@@ -30,12 +30,9 @@ export const TransactionCategory: React.FC<Props> = ({ index, editing, transacti
         };
     }, []);
 
-
-
     const [text, setText] = useState<string>(transaction.categoryId || "");
     const [selectedOption, setSelectedOption] = useState<string | undefined>();
     const [options, setOptions] = useState(allOptions);
-    const [active, setActive] = React.useState<string | null>(null);
 
     const selectMe = () => {
         setText(transaction.categoryId || "");
@@ -44,7 +41,6 @@ export const TransactionCategory: React.FC<Props> = ({ index, editing, transacti
 
     const updateText = useCallback(
         (value: string) => {
-            console.log("updateText: ", value);
             setText(value);
 
             if (value === '') {
@@ -64,7 +60,6 @@ export const TransactionCategory: React.FC<Props> = ({ index, editing, transacti
             });
 
             setSelectedOption(selected);
-            console.log("update selection: ", selected);
             editing.setter({ ...editing.current, categoryId: selected });
         },
         [options],
@@ -88,58 +83,14 @@ export const TransactionCategory: React.FC<Props> = ({ index, editing, transacti
             })
             : null;
 
-    const toggleActive = (id: string) => () => {
-        setActive((activeId) => (activeId !== id ? id : null));
-    };
-
     if (editing.current !== transaction) {
-        const popId = `popover-${index}`;
-        const items = [
-            {
-                content: "Create Rule",
-                onAction: () => { }
-            },
-            {
-                content: "Schedule",
-                onAction: () => { }
-            }
-        ];
-
-        const menu = transaction.categoryId && (
-            <Popover
-                active={popId === active}
-                preferredAlignment="right"
-                activator={
-                    <Button
-                        fullWidth={false}
-                        size="slim"
-                        onClick={toggleActive(popId)}
-                        icon={ChevronDownIcon}
-                        accessibilityLabel="Account list"
-                    />
-                }
-                autofocusTarget="first-node"
-                onClose={toggleActive('popover2')}
-            >
-                <ActionList
-                    actionRole="menuitem"
-                    items={items}
-                />
-            </Popover>
-        );
-
-        const butt = (
-            <InlineStack wrap={false}>
-                <Button
-                    fullWidth
-                    textAlign="start"
-                    variant="tertiary"
-                    onClick={selectMe}>
-                    {transaction.categoryId}
-                </Button>
-                {menu}
-            </InlineStack>);
-        return butt;
+        return <Button
+            fullWidth
+            textAlign="start"
+            variant="tertiary"
+            onClick={selectMe}>
+            {transaction.categoryId}
+        </Button>;
     }
 
     return (

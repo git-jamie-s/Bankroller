@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Frame, IndexTable, Toast, useIndexResourceState } from "@shopify/polaris";
+import { Button, Frame, IndexTable, SkeletonPage, Toast, useIndexResourceState } from "@shopify/polaris";
 import { NonEmptyArray } from "@shopify/polaris/build/ts/src/types";
 import { IndexTableHeading } from "@shopify/polaris/build/ts/src/components/IndexTable";
 import { ArrowUpIcon, ArrowDownIcon, DeleteIcon, EditIcon } from '@shopify/polaris-icons';
@@ -7,7 +7,7 @@ import { FormatCAD } from "../../helpers/Formatter";
 import { StateOption, useFilterState } from "../../helpers/useFilterState";
 import { GMDeleteAutoTransaction } from "../../graphql/GMDeleteAutoTransaction";
 import { AutoTransactionEditDialog } from "./AutoTransactionEdit/AutoTransactionEditDialog";
-import { GMUpdateAutoTransaction } from "../../graphql/GMUpdateAutoTransaction";
+import { GMUpsertAutoTransaction } from "../../graphql/GMUpsertAutoTransaction";
 import { AutoTransactionType } from "../../graphql/Types";
 
 interface Props {
@@ -22,7 +22,7 @@ export const AutoTransactionsList: React.FC<Props> = ({ loading, sorting, autoTr
     const array = autoTransactionArray;
 
     const [deleteAutoTransaction, { data: deleteData, error: deleteError }] = GMDeleteAutoTransaction();
-    const [updateAutoTransaction, { data: updateData, error: updateError }] = GMUpdateAutoTransaction();
+    const [upsertAutoTransaction, { data: updateData, error: updateError }] = GMUpsertAutoTransaction();
 
     const [toastMessage, setToastMessage] = useState<string | null>(null);
     const editingAutoTransaction = useFilterState<AutoTransactionType | null>(null);
@@ -64,10 +64,8 @@ export const AutoTransactionsList: React.FC<Props> = ({ loading, sorting, autoTr
         editingAutoTransaction.setter(autoTransaction);
     };
 
-    const handleSave = () => {
+    const handleSave = (apply) => {
         const changed: AutoTransactionType = editingAutoTransaction.current!;
-
-        console.log("New account", changed.account);
 
         const amount = changed.amount === 0 ? null : changed.amount;
         const input = {
@@ -78,7 +76,7 @@ export const AutoTransactionsList: React.FC<Props> = ({ loading, sorting, autoTr
             transactionType: changed.transactionType,
             accountId: changed.account?.id || null
         };
-        updateAutoTransaction({ variables: { autoTransaction: input } })
+        upsertAutoTransaction({ variables: { autoTransaction: input, apply: apply } })
             .then(() => {
                 editingAutoTransaction.setter(null);
                 setToastMessage("Saved");
@@ -119,6 +117,10 @@ export const AutoTransactionsList: React.FC<Props> = ({ loading, sorting, autoTr
             onClose={() => editingAutoTransaction.setter(null)}
             onSave={handleSave} />;
 
+    if (loading) {
+        return <SkeletonPage />;
+    }
+
     return (
         <Frame>
             <IndexTable
@@ -126,7 +128,6 @@ export const AutoTransactionsList: React.FC<Props> = ({ loading, sorting, autoTr
                 itemCount={array.length}
                 selectable={false}
                 hasZebraStriping
-                loading={loading}
                 pagination={paginationInfo}
             >
                 {rowMarkup}

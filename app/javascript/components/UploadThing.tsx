@@ -65,12 +65,10 @@ export const UploadThing: React.FC<Props> = ({ reload }) => {
     }
 
     const onClose = () => {
-        console.log("CClose");
         setFile(null);
         setStarted(false);
     }
 
-    console.log(status);
     const statusStuff = () => {
 
         if (status === null)

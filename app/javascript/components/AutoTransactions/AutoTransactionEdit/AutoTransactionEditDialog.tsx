@@ -7,17 +7,15 @@ import { AutoTransactionEditAccount } from "./AutoTransactionEditAccount";
 import { AutoTransactionType } from "../../../graphql/Types";
 
 interface Props {
-    autoTransaction: StateOption<AutoTransactionType>;
+    autoTransaction: StateOption<AutoTransactionType | null>;
     onClose: () => void;
-    onSave: () => void;
+    onSave: (apply: boolean) => void;
+    title?: string | undefined;
 }
 
-export const AutoTransactionEditDialog: React.FC<Props> = ({ autoTransaction, onSave, onClose }) => {
-
-    // const autoTran = autoTransaction;
+export const AutoTransactionEditDialog: React.FC<Props> = ({ autoTransaction, onSave, onClose, title = "Edit Import Rule" }) => {
     const curAutoAmount = (autoTransaction.current?.amount || 0) / 100.0;
-    const curAutoAmountStr = curAutoAmount === 0 ? "" : curAutoAmount.toString();
-    const [strAmount, setStrAmount] = useState<string>(curAutoAmountStr);
+    const strAmount = curAutoAmount === 0 ? "" : curAutoAmount.toFixed(2);
 
     const { transactionTypeData } = GQTransactionTypes();
 
@@ -37,12 +35,13 @@ export const AutoTransactionEditDialog: React.FC<Props> = ({ autoTransaction, on
     const onChangeAmount = (amount) => {
         var re = /[-]?\d*\.?\d{0,2}/;
         const filtered = (amount.match(re) || []).join('');
-        setStrAmount(filtered);
         setValue({ amount: Number(filtered) * 100 })
     };
+    if (autoTransaction.current === null) {
+        return null;
+    }
 
-    return <Modal open={true} title="Import Rule Editor" onClose={onClose}
-    >
+    return <Modal open={true} title={title} onClose={onClose}>
         <Card>
             <TextField
                 label="Description (use * for wildcard matching)"
@@ -56,21 +55,24 @@ export const AutoTransactionEditDialog: React.FC<Props> = ({ autoTransaction, on
                 value={autoTransaction.current.transactionType || ""}
                 onChange={onSetTransactionType}
             />
-            <TransactionEditCategory transaction={autoTransaction} />
+            <TransactionEditCategory transaction={autoTransaction as StateOption<AutoTransactionType>} />
             <TextField
+                clearButton
                 label="Amount"
                 type="currency"
                 autoComplete="off"
                 onChange={onChangeAmount}
+                onClearButtonClick={() => { onChangeAmount("") }}
                 value={strAmount}
             />
             <AutoTransactionEditAccount autoTransaction={autoTransaction} />
         </Card>
         <Card>
             <InlineStack align="center" gap="025">
-                <Button variant="primary" onClick={onSave}>Save</Button>
                 <Button onClick={onClose}>Cancel</Button>
+                <Button onClick={() => onSave(true)}>Save And Apply</Button>
+                <Button variant="primary" onClick={() => onSave(false)}>Save</Button>
             </InlineStack>
         </Card>
-    </Modal>;
+    </Modal >;
 };

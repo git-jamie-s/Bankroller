@@ -1,5 +1,5 @@
 import React from "react";
-import { LegacyStack, Tag, Autocomplete, Spinner } from '@shopify/polaris';
+import { LegacyStack, Tag, Autocomplete, Spinner, BlockStack } from '@shopify/polaris';
 import { useState, useCallback, useMemo } from 'react';
 import { GQCategories } from "../../../../graphql/GQCategories";
 import { StateOption } from "../../../../helpers/useFilterState";
@@ -59,7 +59,7 @@ export const CategoriesAutocomplete: React.FC<Props> = ({ categories }) => {
 
     const verticalContentMarkup =
         selectedOptions.length > 0 ? (
-            <LegacyStack spacing="extraTight" alignment="center">
+            <BlockStack>
                 {selectedOptions.map((option) => {
                     let tagLabel = '';
                     tagLabel = option.replace('_', ' ');
@@ -70,7 +70,7 @@ export const CategoriesAutocomplete: React.FC<Props> = ({ categories }) => {
                         </Tag>
                     );
                 })}
-            </LegacyStack>
+            </BlockStack>
         ) : null;
 
     const textField = (
