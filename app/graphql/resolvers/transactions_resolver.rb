@@ -49,7 +49,8 @@ module Resolvers
             end
 
             if categories.any?
-                transactions = transactions.where(category_id: categories)
+                cc = categories.map { |c| c == "no category" ? nil : c }
+                transactions = transactions.where(category_id: cc)
             end
 
             transactions.order(order)

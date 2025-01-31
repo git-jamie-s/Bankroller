@@ -17,7 +17,8 @@ export const CategoriesAutocomplete: React.FC<Props> = ({ categories }) => {
 
     const allOptions = data.map((c: CategoryType) => {
         return { value: c.id, label: c.id };
-    })
+    }).concat([{ value: "no category", label: "None" }]);
+
     const [options, setOptions] = useState(allOptions);
 
     function titleCase(string: string) {
