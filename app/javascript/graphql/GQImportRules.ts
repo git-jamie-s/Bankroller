@@ -3,7 +3,7 @@ import { useQuery, gql } from '@apollo/client';
 import { AmountLimit } from '../components/Accounts/Account/TransactionFilter/AmountFilter';
 import { PaginationQueryParams } from './PaginationType';
 
-export function GQAutoTransactions(
+export function GQImportRules(
     order: string,
     query: string,
     categories: string[],
@@ -11,8 +11,8 @@ export function GQAutoTransactions(
     amountLimit: AmountLimit,
     pagination: PaginationQueryParams
 ) {
-    const GET_AUTO_TRANSACTIONS = gql`
-        query GetAutoTransactions(
+    const GET_IMPORT_RULES = gql`
+        query GetImportRules(
             $query: String
             $categories: [String!]
             $transactionTypes: [String!]
@@ -25,7 +25,7 @@ export function GQAutoTransactions(
             $after: String
             $before: String
             ) {
-            autoTransactions(
+            importRules(
                 query: $query
                 categories: $categories
                 transactionTypes: $transactionTypes
@@ -64,7 +64,7 @@ export function GQAutoTransactions(
     const minAmount = amountLimit.low ? amountLimit.low * 100 : undefined;
     const maxAmount = amountLimit.high ? amountLimit.high * 100 : undefined;
 
-    const { data, loading, error } = useQuery(GET_AUTO_TRANSACTIONS, {
+    const { data, loading, error } = useQuery(GET_IMPORT_RULES, {
         variables: {
             query,
             categories,
@@ -80,7 +80,7 @@ export function GQAutoTransactions(
         }
     });
 
-    const autoTransactions = data?.autoTransactions;
+    const importRules = data?.importRules;
 
-    return { autoTransactions, loading, error };
+    return { importRules, loading, error };
 }

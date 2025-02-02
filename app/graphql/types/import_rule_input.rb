@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Types
-  class AutoTransactionInput < Types::BaseInputObject
+  class ImportRuleInput < Types::BaseInputObject
     argument :id, ID, required: false
     argument :account_id, ID, required: false
     argument :category_id, String

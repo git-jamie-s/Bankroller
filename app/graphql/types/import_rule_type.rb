@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Types
-  class AutoTransactionType < Types::BaseObject
+  class ImportRuleType < Types::BaseObject
     field :id, ID, null: false
 
     field :account, Types::AccountType, null: true

@@ -1,13 +1,13 @@
 import React, { useRef, useState } from "react";
 import { Card, Text } from "@shopify/polaris";
-import { GQAutoTransactions } from "../../graphql/GQAutoTransactions";
+import { GQImportRules } from "../../graphql/GQImportRules";
 import { TransactionFilter } from "../Accounts/Account/TransactionFilter/TransactionFilter";
 import { useFilterState } from "../../helpers/useFilterState";
 import { AmountLimit } from "../Accounts/Account/TransactionFilter/AmountFilter";
 import { PageInfo, PaginationQueryParams } from "../../graphql/PaginationType";
-import { AutoTransactionsList } from "./AutoTransactionsList";
+import { ImportRulesList } from "./ImportRuleList";
 
-export const AutoTransactionsPage: React.FC = () => {
+export const ImportRulesPage: React.FC = () => {
 
     const resetPagination = () => {
         pageNumber.current = 1;
@@ -24,7 +24,7 @@ export const AutoTransactionsPage: React.FC = () => {
     const pageSize = useRef<number>(50);
     const [pagination, setPagination] = useState<PaginationQueryParams>({ first: pageSize.current });
 
-    const { autoTransactions, loading } = GQAutoTransactions(
+    const { importRules, loading } = GQImportRules(
         sorting.current,
         query.current,
         categories.current,
@@ -37,8 +37,8 @@ export const AutoTransactionsPage: React.FC = () => {
         plural: 'import rules',
     };
 
-    const pageInfo: PageInfo = autoTransactions?.pageInfo || {}
-    const pageCount = Math.ceil((autoTransactions?.totalCount || 0) / pageSize.current);
+    const pageInfo: PageInfo = importRules?.pageInfo || {}
+    const pageCount = Math.ceil((importRules?.totalCount || 0) / pageSize.current);
     const onNextPage = () => {
         pageNumber.current++;
         setPagination({ first: pageSize.current, after: pageInfo.endCursor || undefined })
@@ -49,15 +49,15 @@ export const AutoTransactionsPage: React.FC = () => {
     }
 
     const paginationInfo = {
-        hasNext: autoTransactions?.pageInfo.hasNextPage,
-        hasPrevious: autoTransactions?.pageInfo.hasPreviousPage,
+        hasNext: importRules?.pageInfo.hasNextPage,
+        hasPrevious: importRules?.pageInfo.hasPreviousPage,
         onNext: onNextPage,
         onPrevious: onPreviousPage,
         type: "table",
         label: `Page ${pageNumber.current} of ${pageCount}`
     }
 
-    const array = autoTransactions?.edges.map((edge) => edge.node) || [];
+    const array = importRules?.edges.map((edge) => edge.node) || [];
 
     return (<>
         <Card>
@@ -68,13 +68,13 @@ export const AutoTransactionsPage: React.FC = () => {
                 categories={categories}
                 transactionTypes={transactionTypes}
                 amountLimit={amountLimit} />
-            <AutoTransactionsList
+            <ImportRulesList
                 loading={loading}
                 sorting={sorting}
-                autoTransactionArray={array}
+                importRuleArray={array}
                 paginationInfo={paginationInfo} />
         </Card>
     </>);
 };
 
-export default AutoTransactionsPage;
+export default ImportRulesPage;

@@ -1,4 +1,4 @@
-class AutoTransaction < ApplicationRecord
+class ImportRule < ApplicationRecord
     belongs_to :account, optional: true
     belongs_to :category
 

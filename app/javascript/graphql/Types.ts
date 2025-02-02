@@ -10,7 +10,7 @@ export interface AccountType {
     created: Date;
 };
 
-export interface AutoTransactionType {
+export interface ImportRuleType {
     id: string;
     description: string;
     categoryId: string;

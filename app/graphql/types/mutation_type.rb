@@ -2,8 +2,8 @@
 
 module Types
   class MutationType < Types::BaseObject
-    field :upsert_auto_transaction, mutation: Mutations::UpsertAutoTransaction
-    field :delete_auto_transaction, mutation: Mutations::DeleteAutoTransaction
+    field :upsert_import_rule, mutation: Mutations::UpsertImportRule
+    field :delete_import_rule, mutation: Mutations::DeleteImportRule
     field :update_account_name, mutation: Mutations::UpdateAccountName
     field :update_transaction, mutation: Mutations::UpdateTransaction
   end

@@ -2,10 +2,10 @@ import React, { useCallback, useState } from "react"
 import { StateOption } from "../../../helpers/useFilterState";
 import { GQCategories } from "../../../graphql/GQCategories";
 import { Autocomplete } from "@shopify/polaris";
-import { AutoTransactionType, TransactionType } from "../../../graphql/Types";
+import { ImportRuleType, TransactionType } from "../../../graphql/Types";
 
 interface Props {
-    transaction: StateOption<AutoTransactionType | TransactionType>;
+    transaction: StateOption<ImportRuleType | TransactionType>;
     label?: string | null;
 }
 

@@ -3,18 +3,18 @@ import { Card, Modal, Select, TextField, Button, InlineStack } from '@shopify/po
 import { GQTransactionTypes } from "../../../graphql/GQTransactionTypes";
 import { TransactionEditCategory } from "./TransactionEditCategory";
 import { StateOption } from "../../../helpers/useFilterState";
-import { AutoTransactionEditAccount } from "./AutoTransactionEditAccount";
-import { AutoTransactionType } from "../../../graphql/Types";
+import { ImportRuleEditAccount } from "./ImportRuleEditAccount";
+import { ImportRuleType } from "../../../graphql/Types";
 
 interface Props {
-    autoTransaction: StateOption<AutoTransactionType | null>;
+    importRule: StateOption<ImportRuleType | null>;
     onClose: () => void;
     onSave: (apply: boolean) => void;
     title?: string | undefined;
 }
 
-export const AutoTransactionEditDialog: React.FC<Props> = ({ autoTransaction, onSave, onClose, title = "Edit Import Rule" }) => {
-    const curAutoAmount = (autoTransaction.current?.amount || 0) / 100.0;
+export const ImportRuleEditDialog: React.FC<Props> = ({ importRule, onSave, onClose, title = "Edit Import Rule" }) => {
+    const curAutoAmount = (importRule.current?.amount || 0) / 100.0;
     const strAmount = curAutoAmount === 0 ? "" : curAutoAmount.toFixed(2);
 
     const { transactionTypeData } = GQTransactionTypes();
@@ -26,8 +26,8 @@ export const AutoTransactionEditDialog: React.FC<Props> = ({ autoTransaction, on
     ttOptions.unshift({ label: "(any)", value: "" })
 
     function setValue(value) {
-        const newAutoTran = { ...autoTransaction.current, ...value };
-        autoTransaction.setter(newAutoTran);
+        const newAutoTran = { ...importRule.current, ...value };
+        importRule.setter(newAutoTran);
     }
 
     const onChangeDescription = (description) => { setValue({ description }) };
@@ -37,7 +37,7 @@ export const AutoTransactionEditDialog: React.FC<Props> = ({ autoTransaction, on
         const filtered = (amount.match(re) || []).join('');
         setValue({ amount: Number(filtered) * 100 })
     };
-    if (autoTransaction.current === null) {
+    if (importRule.current === null) {
         return null;
     }
 
@@ -45,17 +45,17 @@ export const AutoTransactionEditDialog: React.FC<Props> = ({ autoTransaction, on
         <Card>
             <TextField
                 label="Description (use * for wildcard matching)"
-                value={autoTransaction.current.description}
+                value={importRule.current.description}
                 onChange={onChangeDescription}
                 autoComplete="off"
             />
             <Select
                 options={ttOptions}
                 label="Transaction Type"
-                value={autoTransaction.current.transactionType || ""}
+                value={importRule.current.transactionType || ""}
                 onChange={onSetTransactionType}
             />
-            <TransactionEditCategory transaction={autoTransaction as StateOption<AutoTransactionType>} />
+            <TransactionEditCategory transaction={importRule as StateOption<ImportRuleType>} />
             <TextField
                 clearButton
                 label="Amount"
@@ -65,7 +65,7 @@ export const AutoTransactionEditDialog: React.FC<Props> = ({ autoTransaction, on
                 onClearButtonClick={() => { onChangeAmount("") }}
                 value={strAmount}
             />
-            <AutoTransactionEditAccount autoTransaction={autoTransaction} />
+            <ImportRuleEditAccount importRule={importRule} />
         </Card>
         <Card>
             <InlineStack align="center" gap="025">

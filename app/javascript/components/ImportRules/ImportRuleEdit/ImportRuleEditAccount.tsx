@@ -4,10 +4,10 @@ import { Autocomplete, Select } from "@shopify/polaris";
 import { GQAccounts } from "../../../graphql/GQAccounts";
 
 interface Props {
-    autoTransaction: StateOption<any>;
+    importRule: StateOption<any>;
 }
 
-export const AutoTransactionEditAccount: React.FC<Props> = ({ autoTransaction }) => {
+export const ImportRuleEditAccount: React.FC<Props> = ({ importRule }) => {
     const { accountsData } = GQAccounts();
     const accounts = accountsData?.accounts || [];
 
@@ -16,13 +16,13 @@ export const AutoTransactionEditAccount: React.FC<Props> = ({ autoTransaction })
 
     const onChange = (value) => {
         if (value === "0") {
-            autoTransaction.setter({ ...autoTransaction.current, account: null });
+            importRule.setter({ ...importRule.current, account: null });
         }
         else {
             // Find the account object
             const account = accounts.find((a) => { return a.id.toString() === value });
-            const newAT = { ...autoTransaction.current, account: account };
-            autoTransaction.setter(newAT);
+            const newImportRule = { ...importRule.current, account: account };
+            importRule.setter(newImportRule);
         }
     }
 
@@ -31,7 +31,7 @@ export const AutoTransactionEditAccount: React.FC<Props> = ({ autoTransaction })
             options={options}
             label="Account"
             onChange={onChange}
-            value={autoTransaction.current.account?.id || "0"}
+            value={importRule.current.account?.id || "0"}
         />
     );
 };

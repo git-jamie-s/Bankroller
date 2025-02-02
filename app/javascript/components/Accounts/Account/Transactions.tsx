@@ -8,11 +8,11 @@ import { ArrowUpIcon, ArrowDownIcon } from '@shopify/polaris-icons';
 import { PageInfo, PaginationQueryParams } from "../../../graphql/PaginationType";
 import { useFilterState } from "../../../helpers/useFilterState";
 import { AmountLimit } from "./TransactionFilter/AmountFilter";
-import { AutoTransactionType, TransactionType } from "../../../graphql/Types";
+import { ImportRuleType, TransactionType } from "../../../graphql/Types";
 import { GMUpdateTransaction } from "../../../graphql/GMUpdateTransaction";
 import { TransactionRow } from "./TransactionRow";
-import { GMUpsertAutoTransaction } from "../../../graphql/GMUpsertAutoTransaction";
-import { AutoTransactionEditDialog } from "../../AutoTransactions/AutoTransactionEdit/AutoTransactionEditDialog";
+import { GMUpsertImportRule } from "../../../graphql/GMUpsertImportRule";
+import { ImportRuleEditDialog } from "../../ImportRules/ImportRuleEdit/ImportRuleEditDialog";
 
 interface Props {
     account: any;
@@ -22,12 +22,12 @@ export const Transactions: React.FC<Props> = ({ account }) => {
     const accountId = account.id;
     const [sort, setSort] = useState('date desc, id desc');
     const [updateTransaction] = GMUpdateTransaction();
-    const [upsertAutoTransaction, { data: updateData, error: updateError }] = GMUpsertAutoTransaction();
+    const [upsertImportRule, { data: updateData, error: updateError }] = GMUpsertImportRule();
     const [toastMessage, setToastMessage] = useState<string | null>(null);
-    const createRule = useFilterState<AutoTransactionType | null>(null);
+    const createRule = useFilterState<ImportRuleType | null>(null);
 
     const onCreateRule = (transaction) => {
-        const autoTransaction: AutoTransactionType = {
+        const importRule: ImportRuleType = {
             id: "",
             amount: transaction.amount,
             description: transaction.description!,
@@ -35,10 +35,10 @@ export const Transactions: React.FC<Props> = ({ account }) => {
             categoryId: transaction.categoryId!,
             account: transaction.account
         };
-        createRule.setter(autoTransaction);
+        createRule.setter(importRule);
     };
     const onSaveNewRule = (apply) => {
-        const changed: AutoTransactionType = createRule.current!;
+        const changed: ImportRuleType = createRule.current!;
 
         const amount = changed.amount === 0 ? null : changed.amount;
         const input = {
@@ -50,7 +50,7 @@ export const Transactions: React.FC<Props> = ({ account }) => {
             accountId: changed.account?.id || null
         };
 
-        upsertAutoTransaction({ variables: { autoTransaction: input, apply: apply } })
+        upsertImportRule({ variables: { importRule: input, apply: apply } })
             .then(() => {
                 setToastMessage("New Rule Saved.");
                 createRule.setter(null);
@@ -202,8 +202,8 @@ export const Transactions: React.FC<Props> = ({ account }) => {
             >
                 {rowMarkup}
             </IndexTable >
-            <AutoTransactionEditDialog
-                autoTransaction={createRule}
+            <ImportRuleEditDialog
+                importRule={createRule}
                 onClose={() => { createRule.setter(null) }}
                 onSave={onSaveNewRule}
             />

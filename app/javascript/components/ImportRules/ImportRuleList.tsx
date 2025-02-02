@@ -5,27 +5,26 @@ import { IndexTableHeading } from "@shopify/polaris/build/ts/src/components/Inde
 import { ArrowUpIcon, ArrowDownIcon, DeleteIcon, EditIcon } from '@shopify/polaris-icons';
 import { FormatCAD } from "../../helpers/Formatter";
 import { StateOption, useFilterState } from "../../helpers/useFilterState";
-import { GMDeleteAutoTransaction } from "../../graphql/GMDeleteAutoTransaction";
-import { AutoTransactionEditDialog } from "./AutoTransactionEdit/AutoTransactionEditDialog";
-import { GMUpsertAutoTransaction } from "../../graphql/GMUpsertAutoTransaction";
-import { AutoTransactionType } from "../../graphql/Types";
+import { ImportRuleEditDialog } from "./ImportRuleEdit/ImportRuleEditDialog";
+import { ImportRuleType } from "../../graphql/Types";
+import { GMUpsertImportRule } from "../../graphql/GMUpsertImportRule";
+import { GMDeleteImportRule } from "../../graphql/GMDeleteImportRule";
 
 interface Props {
     loading?: boolean;
     sorting: StateOption<string>;
-    autoTransactionArray: any[];
+    importRuleArray: ImportRuleType[];
     paginationInfo: any;
 }
 
-export const AutoTransactionsList: React.FC<Props> = ({ loading, sorting, autoTransactionArray, paginationInfo }) => {
+export const ImportRulesList: React.FC<Props> = ({ loading, sorting, importRuleArray, paginationInfo }) => {
     const desc = sorting.current.includes(" desc");
-    const array = autoTransactionArray;
 
-    const [deleteAutoTransaction, { data: deleteData, error: deleteError }] = GMDeleteAutoTransaction();
-    const [upsertAutoTransaction, { data: updateData, error: updateError }] = GMUpsertAutoTransaction();
+    const [deleteImportRule, { data: deleteData, error: deleteError }] = GMDeleteImportRule();
+    const [upsertImportRule, { data: updateData, error: updateError }] = GMUpsertImportRule();
 
     const [toastMessage, setToastMessage] = useState<string | null>(null);
-    const editingAutoTransaction = useFilterState<AutoTransactionType | null>(null);
+    const editingImportRule = useFilterState<ImportRuleType | null>(null);
 
     const handleSortClick = (sortVal) => {
         const sameCol = sorting.current.startsWith(sortVal);
@@ -56,16 +55,16 @@ export const AutoTransactionsList: React.FC<Props> = ({ loading, sorting, autoTr
     ];
 
     const onDelete = (id) => {
-        deleteAutoTransaction({ variables: { id: id } })
+        deleteImportRule({ variables: { id: id } })
             .then(() => { setToastMessage("Rule deleted") })
             .catch((e) => { setToastMessage(e.message); });
     };
-    const onEdit = (autoTransaction) => {
-        editingAutoTransaction.setter(autoTransaction);
+    const onEdit = (importRule) => {
+        editingImportRule.setter(importRule);
     };
 
     const handleSave = (apply) => {
-        const changed: AutoTransactionType = editingAutoTransaction.current!;
+        const changed: ImportRuleType = editingImportRule.current!;
 
         const amount = changed.amount === 0 ? null : changed.amount;
         const input = {
@@ -76,15 +75,15 @@ export const AutoTransactionsList: React.FC<Props> = ({ loading, sorting, autoTr
             transactionType: changed.transactionType,
             accountId: changed.account?.id || null
         };
-        upsertAutoTransaction({ variables: { autoTransaction: input, apply: apply } })
+        upsertImportRule({ variables: { importRule: input, apply: apply } })
             .then(() => {
-                editingAutoTransaction.setter(null);
+                editingImportRule.setter(null);
                 setToastMessage("Saved");
             })
             .catch((e) => { setToastMessage(e.message) });
     };
 
-    const rowMarkup = array.map(
+    const rowMarkup = importRuleArray.map(
         (autoTransaction, index) => {
             const amount = autoTransaction.amount && FormatCAD(autoTransaction.amount);
             const accountName = autoTransaction.account?.accountName;
@@ -111,10 +110,10 @@ export const AutoTransactionsList: React.FC<Props> = ({ loading, sorting, autoTr
         <Toast content={toastMessage} onDismiss={() => { setToastMessage(null) }} duration={2000} />
     ) : null;
 
-    const editorMarkup = editingAutoTransaction.current &&
-        <AutoTransactionEditDialog
-            autoTransaction={editingAutoTransaction}
-            onClose={() => editingAutoTransaction.setter(null)}
+    const editorMarkup = editingImportRule.current &&
+        <ImportRuleEditDialog
+            importRule={editingImportRule}
+            onClose={() => editingImportRule.setter(null)}
             onSave={handleSave} />;
 
     if (loading) {
@@ -125,7 +124,7 @@ export const AutoTransactionsList: React.FC<Props> = ({ loading, sorting, autoTr
         <Frame>
             <IndexTable
                 headings={headings}
-                itemCount={array.length}
+                itemCount={importRuleArray.length}
                 selectable={false}
                 hasZebraStriping
                 pagination={paginationInfo}

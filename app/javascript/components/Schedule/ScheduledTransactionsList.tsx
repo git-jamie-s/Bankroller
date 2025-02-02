@@ -5,7 +5,6 @@ import { IndexTableHeading } from "@shopify/polaris/build/ts/src/components/Inde
 import { ArrowUpIcon, ArrowDownIcon, DeleteIcon, EditIcon } from '@shopify/polaris-icons';
 import { FormatCAD } from "../../helpers/Formatter";
 import { StateOption, useFilterState } from "../../helpers/useFilterState";
-import { GMDeleteAutoTransaction } from "../../graphql/GMDeleteAutoTransaction";
 
 interface Props {
     loading?: boolean;

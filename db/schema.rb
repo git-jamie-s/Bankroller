@@ -24,18 +24,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_10_031028) do
     t.datetime "created"
   end
 
-  create_table "auto_transactions", force: :cascade do |t|
+  create_table "categories", id: :string, force: :cascade do |t|
+    t.bigint "budget_amount"
+    t.integer "budget_period"
+  end
+
+  create_table "import_rules", force: :cascade do |t|
     t.string "description", null: false
     t.string "category_id", null: false
     t.bigint "account_id"
     t.string "transaction_type"
     t.bigint "amount"
-    t.index ["description", "category_id", "account_id", "transaction_type", "amount"], name: "auto_all_unique", unique: true, nulls_not_distinct: true
-  end
-
-  create_table "categories", id: :string, force: :cascade do |t|
-    t.bigint "budget_amount"
-    t.integer "budget_period"
+    t.index ["description", "category_id", "account_id", "transaction_type", "amount"], name: "import_rules_all_unique", unique: true, nulls_not_distinct: true
   end
 
   create_table "scheduled_transactions", force: :cascade do |t|
@@ -63,8 +63,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_10_031028) do
     t.string "notes", default: "", null: false
   end
 
-  add_foreign_key "auto_transactions", "accounts", name: "fkks6fwyv2qo7svlfn35872k9or"
-  add_foreign_key "auto_transactions", "categories", name: "fk4tlwv09bjvqo1a57ynfu4x4oi"
+  add_foreign_key "import_rules", "accounts", name: "fkks6fwyv2qo7svlfn35872k9or"
+  add_foreign_key "import_rules", "categories", name: "fk4tlwv09bjvqo1a57ynfu4x4oi"
   add_foreign_key "scheduled_transactions", "accounts", name: "fkqbg7u61v57f84hu9xbamsk2mc"
   add_foreign_key "transactions", "accounts", name: "fk60ogq0ga4x4y0fkeu24tgm0kv"
   add_foreign_key "transactions", "categories", name: "fkdv2mk0d5egsjapqkwcjgyw4ta"

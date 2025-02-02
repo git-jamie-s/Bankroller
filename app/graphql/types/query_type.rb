@@ -34,7 +34,7 @@ module Types
 
     field :scheduled_transactions, [ Types::ScheduledTransactionType ], null: false, resolver: Resolvers::ScheduledTransactionsResolver
 
-    field :auto_transactions, Types::AutoTransactionType.connection_type, null: false, resolver: Resolvers::AutoTransactionsResolver
+    field :import_rules, Types::ImportRuleType.connection_type, null: false, resolver: Resolvers::ImportRulesResolver
     field :transactions, Types::TransactionType.connection_type, null: false, description: "A list of transactions", resolver: Resolvers::TransactionsResolver
 
     field :transaction_types, [ String ], null: false
