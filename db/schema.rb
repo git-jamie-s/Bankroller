@@ -38,6 +38,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_10_031028) do
     t.integer "budget_period"
   end
 
+  create_table "scheduled_transactions", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.string "transaction_type", null: false
+    t.string "description", null: false
+    t.bigint "min_amount", null: false
+    t.bigint "max_amount"
+    t.string "period", null: false
+    t.string "weekend_adjust", null: false
+    t.date "start_date", null: false
+  end
+
   create_table "transactions", id: :string, force: :cascade do |t|
     t.bigint "amount", null: false
     t.bigint "balance"
@@ -54,6 +65,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_10_031028) do
 
   add_foreign_key "auto_transactions", "accounts", name: "fkks6fwyv2qo7svlfn35872k9or"
   add_foreign_key "auto_transactions", "categories", name: "fk4tlwv09bjvqo1a57ynfu4x4oi"
+  add_foreign_key "scheduled_transactions", "accounts", name: "fkqbg7u61v57f84hu9xbamsk2mc"
   add_foreign_key "transactions", "accounts", name: "fk60ogq0ga4x4y0fkeu24tgm0kv"
   add_foreign_key "transactions", "categories", name: "fkdv2mk0d5egsjapqkwcjgyw4ta"
 end
