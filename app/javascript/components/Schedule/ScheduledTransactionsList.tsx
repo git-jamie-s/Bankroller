@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-import { Button, Frame, Icon, IndexTable, SkeletonPage, Toast, useIndexResourceState } from "@shopify/polaris";
+import React, { useEffect, useState } from "react";
+import { Button, Frame, Icon, IndexTable, SkeletonPage, Toast } from "@shopify/polaris";
 import { NonEmptyArray } from "@shopify/polaris/build/ts/src/types";
 import { IndexTableHeading } from "@shopify/polaris/build/ts/src/components/IndexTable";
-import { ArrowUpIcon, ArrowDownIcon, DeleteIcon, EditIcon, ButtonIcon } from '@shopify/polaris-icons';
-import { FormatCAD } from "../../helpers/Formatter";
+import { ArrowUpIcon, ArrowDownIcon, ButtonIcon } from '@shopify/polaris-icons';
 import { StateOption, useFilterState } from "../../helpers/useFilterState";
-import { GMDeleteScheduledTransaction } from "../../graphql/GMDeleteScheduledTransaction";
+import { ScheduledTransactionType } from "../../graphql/Types";
+import { ScheduledTransactionRow } from "./ScheduledTransactionRow";
+import { GMUpdateScheduledTransaction } from "../../graphql/GMUpdateScheduledTransaction";
 
 interface Props {
     loading?: boolean;
@@ -17,10 +18,39 @@ export const ScheduledTransactionsList: React.FC<Props> = ({ loading, sorting, s
     const desc = sorting.current.includes(" desc");
     const array = scheduledTransactionArray;
 
-    const [toastMessage, setToastMessage] = useState<string | null>(null);
-    const [deleteScheduledTransaction, { data: deleteData, error: deleteError }] = GMDeleteScheduledTransaction();
+    useEffect(() => {
+        const handleEsc = (event) => {
+            if (event.key === 'Escape') {
+                console.log("Escape");
+                editinMinAmount.setter(null);
+                editinMaxAmount.setter(null);
+            }
+        };
+        window.addEventListener('keydown', handleEsc);
 
-    // const editingAutoTransaction = useFilterState<AutoTransactionType | null>(null);
+        return () => {
+            window.removeEventListener('keydown', handleEsc);
+        };
+    }, []);
+
+    const [updateScheduledTransaction] = GMUpdateScheduledTransaction();
+
+    const onChange = (st) => {
+        console.log("Updated: ", st);
+        if (st != null) {
+            const input = {
+                id: st.id,
+                minAmount: st.minAmount,
+                maxAmount: st.maxAmount
+            };
+            updateScheduledTransaction({ variables: { scheduledTransaction: input } })
+                .then(() => { setToastMessage("Saved") });
+        }
+    }
+
+    const editinMinAmount = useFilterState<ScheduledTransactionType | null>(null, onChange);
+    const editinMaxAmount = useFilterState<ScheduledTransactionType | null>(null);
+    const [toastMessage, setToastMessage] = useState<string | null>(null);
 
     const handleSortClick = (sortVal) => {
         const sameCol = sorting.current.startsWith(sortVal);
@@ -50,59 +80,15 @@ export const ScheduledTransactionsList: React.FC<Props> = ({ loading, sorting, s
         { id: 'account', title: titleButton("Account", "account.account_name") },
     ];
 
-    const onDelete = (scheduledTransaction) => {
-        deleteScheduledTransaction({ variables: { id: scheduledTransaction.id } })
-            .then(() => { setToastMessage("Scheduled Transaction deleted") })
-            .catch((e) => { setToastMessage(e.message); });
-    };
-    const onEdit = (scheduledTransaction) => {
-        // editingAutoTransaction.setter(autoTransaction);
-    };
-
-    // const handleSave = (apply) => {
-    //     const changed: AutoTransactionType = editingAutoTransaction.current!;
-
-    //     const amount = changed.amount === 0 ? null : changed.amount;
-    //     const input = {
-    //         id: changed.id,
-    //         description: changed.description,
-    //         categoryId: changed.categoryId,
-    //         amount: amount,
-    //         transactionType: changed.transactionType,
-    //         accountId: changed.account?.id || null
-    //     };
-    //     upsertAutoTransaction({ variables: { autoTransaction: input, apply: apply } })
-    //         .then(() => {
-    //             editingAutoTransaction.setter(null);
-    //             setToastMessage("Saved");
-    //         })
-    //         .catch((e) => { setToastMessage(e.message) });
-    // };
-
     const rowMarkup = array.map(
         (scheduledTransaction, index) => {
-
-            const accountName = scheduledTransaction.account.accountName;
-            const min_amount = FormatCAD(scheduledTransaction.minAmount);
-            const max_amount = scheduledTransaction.maxAmount ?
-                FormatCAD(scheduledTransaction.maxAmount) : "-";
-
-            return (
-                <IndexTable.Row
-                    id={scheduledTransaction.id}
-                    key={scheduledTransaction.id}
-                    position={index}>
-                    <IndexTable.Cell>
-                        <Button icon={DeleteIcon} onClick={() => onDelete(scheduledTransaction)} />
-                        <Button icon={EditIcon} onClick={() => onEdit(scheduledTransaction)} />
-                    </IndexTable.Cell>
-                    <IndexTable.Cell>{scheduledTransaction.description}</IndexTable.Cell>
-                    <IndexTable.Cell>{scheduledTransaction.transactionType}</IndexTable.Cell>
-                    <IndexTable.Cell>{min_amount}</IndexTable.Cell>
-                    <IndexTable.Cell>{max_amount}</IndexTable.Cell>
-                    <IndexTable.Cell>{accountName}</IndexTable.Cell>
-                </IndexTable.Row>
-            )
+            return <ScheduledTransactionRow
+                index={index}
+                scheduledTransaction={scheduledTransaction}
+                setToastMessage={setToastMessage}
+                editingMaxAmount={editinMaxAmount}
+                editingMinAmount={editinMinAmount}
+            />
         }
     );
 

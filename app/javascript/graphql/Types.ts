@@ -49,3 +49,18 @@ export interface TransactionInputType {
     description: string;
     categoryId?: string;
 }
+
+export interface ScheduledTransactionType {
+    id: string;
+    account: AccountType;
+    transactionType: string;
+    description: string;
+
+    minAmount: number;
+    maxAmount?: number;
+
+    start_date: Date;
+
+    period: string;
+    weekendAdjust: string
+};

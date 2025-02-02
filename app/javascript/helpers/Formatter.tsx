@@ -12,3 +12,8 @@ export function FormatCAD(pennies: number): ReactElement {
         return (<Text as="p" tone="success">{str}</Text>);
     }
 }
+
+export function FormatAmountString(pennies: number): string {
+    const dolls = (pennies / 100.0).toFixed(2);
+    return dolls;
+}
