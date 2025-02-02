@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Button, Frame, IndexTable, SkeletonPage, Toast, useIndexResourceState } from "@shopify/polaris";
+import { Button, Frame, Icon, IndexTable, SkeletonPage, Toast, useIndexResourceState } from "@shopify/polaris";
 import { NonEmptyArray } from "@shopify/polaris/build/ts/src/types";
 import { IndexTableHeading } from "@shopify/polaris/build/ts/src/components/IndexTable";
-import { ArrowUpIcon, ArrowDownIcon, DeleteIcon, EditIcon } from '@shopify/polaris-icons';
+import { ArrowUpIcon, ArrowDownIcon, DeleteIcon, EditIcon, ButtonIcon } from '@shopify/polaris-icons';
 import { FormatCAD } from "../../helpers/Formatter";
 import { StateOption, useFilterState } from "../../helpers/useFilterState";
+import { GMDeleteScheduledTransaction } from "../../graphql/GMDeleteScheduledTransaction";
 
 interface Props {
     loading?: boolean;
@@ -17,6 +18,8 @@ export const ScheduledTransactionsList: React.FC<Props> = ({ loading, sorting, s
     const array = scheduledTransactionArray;
 
     const [toastMessage, setToastMessage] = useState<string | null>(null);
+    const [deleteScheduledTransaction, { data: deleteData, error: deleteError }] = GMDeleteScheduledTransaction();
+
     // const editingAutoTransaction = useFilterState<AutoTransactionType | null>(null);
 
     const handleSortClick = (sortVal) => {
@@ -39,7 +42,7 @@ export const ScheduledTransactionsList: React.FC<Props> = ({ loading, sorting, s
     }
 
     const headings: NonEmptyArray<IndexTableHeading> = [
-        { id: "buttons", title: "" },
+        { id: "buttons", title: <Icon source={ButtonIcon} /> },
         { id: 'description', title: titleButton("Description", "description") },
         { id: 'type', title: titleButton("Transaction Type", "transaction_type") },
         { id: 'min_amount', title: titleButton("Min amount", "min_amount") },
@@ -47,14 +50,14 @@ export const ScheduledTransactionsList: React.FC<Props> = ({ loading, sorting, s
         { id: 'account', title: titleButton("Account", "account.account_name") },
     ];
 
-    // const onDelete = (id) => {
-    //     deleteAutoTransaction({ variables: { id: id } })
-    //         .then(() => { setToastMessage("Rule deleted") })
-    //         .catch((e) => { setToastMessage(e.message); });
-    // };
-    // const onEdit = (autoTransaction) => {
-    //     editingAutoTransaction.setter(autoTransaction);
-    // };
+    const onDelete = (scheduledTransaction) => {
+        deleteScheduledTransaction({ variables: { id: scheduledTransaction.id } })
+            .then(() => { setToastMessage("Scheduled Transaction deleted") })
+            .catch((e) => { setToastMessage(e.message); });
+    };
+    const onEdit = (scheduledTransaction) => {
+        // editingAutoTransaction.setter(autoTransaction);
+    };
 
     // const handleSave = (apply) => {
     //     const changed: AutoTransactionType = editingAutoTransaction.current!;
@@ -90,9 +93,8 @@ export const ScheduledTransactionsList: React.FC<Props> = ({ loading, sorting, s
                     key={scheduledTransaction.id}
                     position={index}>
                     <IndexTable.Cell>
-                        Hey
-                        {/* <Button icon={DeleteIcon} onClick={() => onDelete(autoTransaction.id)} />
-                        <Button icon={EditIcon} onClick={() => onEdit(autoTransaction)} /> */}
+                        <Button icon={DeleteIcon} onClick={() => onDelete(scheduledTransaction)} />
+                        <Button icon={EditIcon} onClick={() => onEdit(scheduledTransaction)} />
                     </IndexTable.Cell>
                     <IndexTable.Cell>{scheduledTransaction.description}</IndexTable.Cell>
                     <IndexTable.Cell>{scheduledTransaction.transactionType}</IndexTable.Cell>

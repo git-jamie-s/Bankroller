@@ -6,5 +6,6 @@ module Types
     field :delete_import_rule, mutation: Mutations::DeleteImportRule
     field :update_account_name, mutation: Mutations::UpdateAccountName
     field :update_transaction, mutation: Mutations::UpdateTransaction
+    field :delete_scheduled_transaction, mutation: Mutations::DeleteScheduledTransaction
   end
 end
