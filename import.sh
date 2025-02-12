@@ -39,6 +39,6 @@ DROP TABLE autotransaction CASCADE;
 DROP TABLE transaction CASCADE;
 DROP TABLE account CASCADE;
 DROP TABLE category CASCADE;
-DROP TABLE scheduled_transaction CASCADE;
+DROP TABLE scheduledtransaction CASCADE;
 COMMIT;
 HERE

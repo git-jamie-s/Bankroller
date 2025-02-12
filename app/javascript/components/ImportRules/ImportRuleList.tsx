@@ -47,11 +47,11 @@ export const ImportRulesList: React.FC<Props> = ({ loading, sorting, importRuleA
 
     const headings: NonEmptyArray<IndexTableHeading> = [
         { id: "buttons", title: "" },
-        { id: 'description', title: titleButton("Matching Description", "description") },
-        { id: 'type', title: titleButton("Matching Type", "transaction_type") },
-        { id: 'category', title: titleButton("Matching category", "category_id") },
-        { id: 'amount', title: titleButton("Matching amount", "amount") },
+        { id: 'description', title: titleButton("Description", "description") },
+        { id: 'type', title: titleButton("Type", "transaction_type") },
+        { id: 'amount', title: titleButton("Amount", "amount") },
         { id: 'account', title: titleButton("Account", "account.account_name") },
+        { id: 'category', title: titleButton("Category to set", "category_id") },
     ];
 
     const onDelete = (id) => {
@@ -98,9 +98,9 @@ export const ImportRulesList: React.FC<Props> = ({ loading, sorting, importRuleA
                     </IndexTable.Cell>
                     <IndexTable.Cell>{autoTransaction.description}</IndexTable.Cell>
                     <IndexTable.Cell>{autoTransaction.transactionType}</IndexTable.Cell>
-                    <IndexTable.Cell>{autoTransaction.categoryId}</IndexTable.Cell>
                     <IndexTable.Cell>{amount}</IndexTable.Cell>
                     <IndexTable.Cell>{accountName}</IndexTable.Cell>
+                    <IndexTable.Cell>{autoTransaction.categoryId}</IndexTable.Cell>
                 </IndexTable.Row>
             )
         }
