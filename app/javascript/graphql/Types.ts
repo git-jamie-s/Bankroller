@@ -17,7 +17,7 @@ export interface ImportRuleType {
     transactionType?: string;
     amount?: number;
     account?: AccountType;
-}
+};
 
 export interface CategoryType {
     id: string;
@@ -50,6 +50,21 @@ export interface TransactionInputType {
     categoryId?: string;
 }
 
+export enum PeriodEnum {
+    Weekly = "Weekly",
+    TwoWeeks = "TwoWeeks",
+    Monthly = "Monthly",
+    TwiceMonthly = "TwiceMonthly",
+    Yearly = "Yearly"
+}
+
+export enum WeekendAdjustEnum {
+    None = "None",
+    Before = "Before",
+    After = "After",
+    Closest = "Closest"
+}
+
 export interface ScheduledTransactionType {
     id: string;
     account: AccountType;
@@ -61,6 +76,6 @@ export interface ScheduledTransactionType {
 
     startDate: Date;
 
-    period: string;
+    period: PeriodEnum;
     weekendAdjust: string
 };

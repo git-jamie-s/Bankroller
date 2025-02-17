@@ -38,12 +38,13 @@ export const ScheduledTransactionsList: React.FC<Props> = ({ loading, sorting, s
     const onChange = (st) => {
         console.log("Updated: ", st);
         if (st != null) {
-            const input = {
-                id: st.id,
-                minAmount: st.minAmount,
-                maxAmount: st.maxAmount
-            };
-            updateScheduledTransaction({ variables: { scheduledTransaction: input } })
+            updateScheduledTransaction({
+                variables: {
+                    id: st.id,
+                    minAmount: st.minAmount,
+                    maxAmount: st.maxAmount
+                }
+            })
                 .then(() => { setToastMessage("Saved") });
         }
     }

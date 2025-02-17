@@ -4,13 +4,14 @@ module Mutations
   class UpdateScheduledTransaction < BaseMutation
     field :ok, Boolean, null: false
 
-    argument :scheduled_transaction, Types::ScheduledTransactionInput, required: true
+    argument :id, ID, required: true
+    argument :min_amount, Integer, required: true
+    argument :max_amount, Integer, required: false
 
-    def resolve(scheduled_transaction:)
-      record = ScheduledTransaction.find(scheduled_transaction.id)
+    def resolve(id:, min_amount:, max_amount:)
+      record = ScheduledTransaction.find(id)
 
-      hash = scheduled_transaction.to_h
-      record.update(hash)
+      record.update(min_amount:, max_amount:)
       { ok: true }
     end
   end

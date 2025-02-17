@@ -17,3 +17,9 @@ export function FormatAmountString(pennies: number): string {
     const dolls = (pennies / 100.0).toFixed(2);
     return dolls;
 }
+
+export function WeekdayName(d: Date): string {
+    const dd = new Date(d);
+    const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    return dayNames[dd.getDay()];
+}

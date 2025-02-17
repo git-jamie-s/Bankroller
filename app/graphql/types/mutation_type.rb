@@ -7,6 +7,7 @@ module Types
     field :update_account_name, mutation: Mutations::UpdateAccountName
     field :update_transaction, mutation: Mutations::UpdateTransaction
     field :delete_scheduled_transaction, mutation: Mutations::DeleteScheduledTransaction
+    field :create_scheduled_transaction, mutation: Mutations::CreateScheduledTransaction
     field :update_scheduled_transaction, mutation: Mutations::UpdateScheduledTransaction
   end
 end

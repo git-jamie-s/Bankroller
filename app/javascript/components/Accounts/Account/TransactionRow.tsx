@@ -15,10 +15,17 @@ interface Props {
     editingDescription: StateOption<TransactionType | null>;
     editingCategory: StateOption<TransactionType | null>;
     onCreateRule: (transaction) => void;
-
+    onScheduleTransaction: (transaction) => void;
 };
 
-export const TransactionRow: React.FC<Props> = ({ index, transaction, includeAccount, includeBalance, editingDescription, editingCategory, onCreateRule }) => {
+export const TransactionRow: React.FC<Props> = ({ index,
+    transaction,
+    includeAccount,
+    includeBalance,
+    editingDescription,
+    editingCategory,
+    onCreateRule,
+    onScheduleTransaction }) => {
     const amount = FormatCAD(transaction.amount);
     const balance = FormatCAD(transaction.balance);
     const [active, setActive] = React.useState<string | null>(null);
@@ -34,7 +41,10 @@ export const TransactionRow: React.FC<Props> = ({ index, transaction, includeAcc
         },
         {
             content: "Schedule",
-            onAction: () => { }
+            onAction: () => {
+                setActive(null);
+                onScheduleTransaction(transaction);
+            }
         }
     ];
 

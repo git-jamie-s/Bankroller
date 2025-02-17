@@ -8,11 +8,13 @@ import { ArrowUpIcon, ArrowDownIcon } from '@shopify/polaris-icons';
 import { PageInfo, PaginationQueryParams } from "../../../graphql/PaginationType";
 import { useFilterState } from "../../../helpers/useFilterState";
 import { AmountLimit } from "./TransactionFilter/AmountFilter";
-import { ImportRuleType, TransactionType } from "../../../graphql/Types";
+import { ImportRuleType, PeriodEnum, TransactionType, WeekendAdjustEnum } from "../../../graphql/Types";
 import { GMUpdateTransaction } from "../../../graphql/GMUpdateTransaction";
 import { TransactionRow } from "./TransactionRow";
 import { GMUpsertImportRule } from "../../../graphql/GMUpsertImportRule";
 import { ImportRuleEditDialog } from "../../ImportRules/ImportRuleEdit/ImportRuleEditDialog";
+import { GMCreateScheduledTransaction } from "../../../graphql/GMCreateScheduledTransaction";
+import { ScheduleTransactionDialog } from "./ScheduleTransactionDialog/ScheduleTransactionDialog";
 
 interface Props {
     account: any;
@@ -23,8 +25,11 @@ export const Transactions: React.FC<Props> = ({ account }) => {
     const [sort, setSort] = useState('date desc, id desc');
     const [updateTransaction] = GMUpdateTransaction();
     const [upsertImportRule, { data: updateData, error: updateError }] = GMUpsertImportRule();
+    const [createScheduledTransaction, { data: createSchedTxData }] = GMCreateScheduledTransaction();
+
     const [toastMessage, setToastMessage] = useState<string | null>(null);
     const createRule = useFilterState<ImportRuleType | null>(null);
+    const createSxTx = useFilterState<TransactionType | null>(null);
 
     const onCreateRule = (transaction) => {
         const importRule: ImportRuleType = {
@@ -58,6 +63,9 @@ export const Transactions: React.FC<Props> = ({ account }) => {
             .catch((e) => { setToastMessage(e.message) });
     };
 
+    const onScheduleTransaction = (transaction) => {
+        createSxTx.setter(transaction);
+    }
 
     const resetPagination = () => {
         pageNumber.current = 1;
@@ -107,7 +115,8 @@ export const Transactions: React.FC<Props> = ({ account }) => {
                 includeBalance={includeBalance}
                 editingDescription={editingTransactionDesc}
                 editingCategory={editingTransactionCat}
-                onCreateRule={onCreateRule} />;
+                onCreateRule={onCreateRule}
+                onScheduleTransaction={onScheduleTransaction} />;
         }
     );
 
@@ -185,6 +194,21 @@ export const Transactions: React.FC<Props> = ({ account }) => {
         <Toast content={toastMessage} onDismiss={() => { setToastMessage(null) }} duration={2000} />
     ) : null;
 
+
+    const handleScheduleTransaction = (transactionId: string, period: PeriodEnum, weekend: WeekendAdjustEnum) => {
+        createScheduledTransaction({
+            variables: {
+                transactionId,
+                period,
+                weekendAdjust: weekend
+            }
+        }).then(() => {
+            setToastMessage("Transaction Scheduled");
+            createSxTx.setter(null);
+        })
+            .catch((e) => { setToastMessage(e.message) });
+    }
+
     return (
         <Frame>
             <TransactionFilter
@@ -207,6 +231,9 @@ export const Transactions: React.FC<Props> = ({ account }) => {
                 onClose={() => { createRule.setter(null) }}
                 onSave={onSaveNewRule}
             />
+            <ScheduleTransactionDialog transaction={createSxTx}
+                onClose={() => createSxTx.setter(null)}
+                onSave={handleScheduleTransaction} />
             {toastMarkup}
         </Frame>
     );
