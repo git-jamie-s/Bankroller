@@ -26,7 +26,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_10_031028) do
 
   create_table "categories", id: :string, force: :cascade do |t|
     t.bigint "budget_amount"
-    t.string "period"
+    t.string "budget_period"
   end
 
   create_table "import_rules", force: :cascade do |t|
@@ -35,7 +35,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_10_031028) do
     t.bigint "account_id"
     t.string "transaction_type"
     t.bigint "amount"
-    t.index ["description", "category_id", "account_id", "transaction_type", "amount"], name: "import_rules_all_unique", unique: true, nulls_not_distinct: true
+    t.index ["description", "category_id", "account_id", "transaction_type", "amount"], name: "import_rules_all_unique", unique: true
   end
 
   create_table "scheduled_transactions", force: :cascade do |t|

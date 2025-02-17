@@ -8,17 +8,17 @@ INSERT into accounts(id, account_name, account_type, bank_account_id, bank_id, c
 SELECT setval(pg_get_serial_sequence('accounts', 'id'), max(id)) FROM accounts;
 
 CREATE TEMPORARY TABLE cat_lookup(
-   budget_period bigint,
-   period varchar
+   bp bigint,
+   budget_period varchar
 );
-INSERT INTO cat_lookup (budget_period, period) VALUES (0, 'WEEKLY');
-INSERT INTO cat_lookup (budget_period, period) VALUES (1, 'BIWEEKLY');
-INSERT INTO cat_lookup (budget_period, period) VALUES (2, 'MONTHLY');
-INSERT INTO cat_lookup (budget_period, period) VALUES (3, 'MONTHLYx2');
-INSERT INTO cat_lookup (budget_period, period) VALUES (4, 'YEARLY');
+INSERT INTO cat_lookup (bp, budget_period) VALUES (0, 'WEEKLY');
+INSERT INTO cat_lookup (bp, budget_period) VALUES (1, 'BIWEEKLY');
+INSERT INTO cat_lookup (bp, budget_period) VALUES (2, 'MONTHLY');
+INSERT INTO cat_lookup (bp, budget_period) VALUES (3, 'MONTHLYx2');
+INSERT INTO cat_lookup (bp, budget_period) VALUES (4, 'YEARLY');
 
-INSERT into categories (id, budget_amount, period)
-    SELECT category, budget_amount, period FROM category INNER JOIN cat_lookup USING (budget_period);
+INSERT into categories (id, budget_amount, budget_period)
+    SELECT category, budget_amount, catl.budget_period FROM category INNER JOIN cat_lookup catl ON (category.budget_period = catl.bp);
 
 INSERT into transactions(id, amount, balance, cheque_number,
     date, description, memo, provisional,
