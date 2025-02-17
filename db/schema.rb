@@ -26,7 +26,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_10_031028) do
 
   create_table "categories", id: :string, force: :cascade do |t|
     t.bigint "budget_amount"
-    t.integer "budget_period"
+    t.string "period"
   end
 
   create_table "import_rules", force: :cascade do |t|

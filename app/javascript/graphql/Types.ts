@@ -59,7 +59,7 @@ export interface ScheduledTransactionType {
     minAmount: number;
     maxAmount?: number;
 
-    start_date: Date;
+    startDate: Date;
 
     period: string;
     weekendAdjust: string

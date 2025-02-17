@@ -13,7 +13,7 @@ class CreateAccounts < ActiveRecord::Migration[8.0]
 
     create_table "categories", id: :string do |t|
       t.bigint "budget_amount"
-      t.integer "budget_period"
+      t.string "period"
     end
 
     create_table "transactions", id: :string, force: :cascade do |t|

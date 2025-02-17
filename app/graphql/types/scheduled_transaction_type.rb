@@ -13,7 +13,7 @@ module Types
 
     field :start_date, GraphQL::Types::ISO8601Date, null: false
 
-    field :period, String, null: false
+    field :period, Types::PeriodEnum, null: false
     field :weekend_adjust, Types::WeekendAdjustEnum, null: true
   end
 end

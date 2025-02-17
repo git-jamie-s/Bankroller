@@ -75,9 +75,12 @@ export const ScheduledTransactionsList: React.FC<Props> = ({ loading, sorting, s
         { id: "buttons", title: <Icon source={ButtonIcon} /> },
         { id: 'description', title: titleButton("Description", "description") },
         { id: 'type', title: titleButton("Transaction Type", "transaction_type") },
-        { id: 'min_amount', title: titleButton("Min amount", "min_amount") },
-        { id: 'max_amount', title: titleButton("Max amount", "max_amount") },
+        { id: 'minAmount', title: titleButton("Min amount", "min_amount") },
+        { id: 'maxAmount', title: titleButton("Max amount", "max_amount") },
         { id: 'account', title: titleButton("Account", "account.account_name") },
+        { id: 'schedule', title: "Schedule" },
+        { id: 'w_a', title: "Weekend Adjust" },
+        { id: 'startDate', title: "Start Date" },
     ];
 
     const rowMarkup = array.map(

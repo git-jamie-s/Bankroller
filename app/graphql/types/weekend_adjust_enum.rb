@@ -1,6 +1,6 @@
 class Types::WeekendAdjustEnum < Types::BaseEnum
-  value "NONE"
-  value "BEFORE"
-  value "AFTER"
-  value "CLOSEST"
+  value("None", value: "NONE")
+  value("Before", value: "BEFORE")
+  value("After", value: "AFTER")
+  value("Closest", value: "CLOSEST")
 end

@@ -65,6 +65,8 @@ export const ScheduledTransactionRow: React.FC<Props> = ({ index, scheduledTrans
         />;
     }
 
+    const startDate = scheduledTransaction.startDate.toString();
+
     return (
         <IndexTable.Row
             id={scheduledTransaction.id}
@@ -78,6 +80,9 @@ export const ScheduledTransactionRow: React.FC<Props> = ({ index, scheduledTrans
             <IndexTable.Cell>{minAmountCell()}</IndexTable.Cell>
             <IndexTable.Cell>{max_amount}</IndexTable.Cell>
             <IndexTable.Cell>{accountName}</IndexTable.Cell>
+            <IndexTable.Cell>{scheduledTransaction.period}</IndexTable.Cell>
+            <IndexTable.Cell>{scheduledTransaction.weekendAdjust}</IndexTable.Cell>
+            <IndexTable.Cell>{startDate}</IndexTable.Cell>
         </IndexTable.Row>
     );
 };
