@@ -1,86 +1,43 @@
 import React from "react";
-import { Card, Button, Text, ButtonGroup, ActionList, Popover, InlineStack } from "@shopify/polaris";
+import { Card, Button, Text, ButtonGroup, InlineStack } from "@shopify/polaris";
 import { BasePage } from "./BasePage";
-import { FolderIcon, ChartHistogramSecondLastIcon, NoteIcon, CalendarIcon, WalletIcon, CodeAddIcon } from '@shopify/polaris-icons';
+import { ChartHistogramSecondLastIcon, CalendarIcon, CodeAddIcon } from '@shopify/polaris-icons';
 import { Outlet } from "react-router-dom";
 import { useParams } from "react-router";
 import { useLocation } from 'react-router-dom'
-import { ChevronDownIcon } from '@shopify/polaris-icons';
 import { GQAccounts } from "../graphql/GQAccounts";
 import { FormatCAD } from "../helpers/Formatter";
 import { UploadThing } from "./UploadThing";
 import { useApolloClient } from '@apollo/client';
+import AccountsButton from "./AccountsButton";
+import ReportsButton from "./ReportsButton";
 
 export const Home: React.FC = () => {
 
     const sections = [
-        ["Reports", FolderIcon, "/reports"],
         ["Budgets", ChartHistogramSecondLastIcon, "/budgets"],
-        ["Summary", WalletIcon, "/summary"],
         ["Import Rules", CodeAddIcon, "/rules"],
         ["Schedule", CalendarIcon, "/schedule"],
-        ["Notes", NoteIcon, "/notes"],
     ];
 
     const location = useLocation();
     const params = useParams();
     const accountId = params.account;
-    const [active, setActive] = React.useState<string | null>(null);
     const apolloClient = useApolloClient();
 
     const { accountsData } = GQAccounts();
-
-    const toggleActive = (id: string) => () => {
-        setActive((activeId) => (activeId !== id ? id : null));
-    };
-
-    const actionListItems = accountsData?.accounts.map((account) => {
-        return {
-            content: account.accountName,
-            url: `/accounts/${account.id}`
-        };
-    }
-    );
-    if (actionListItems) {
-        actionListItems.push({ content: "All", url: "/accounts/0" });
-    }
 
     const onUploadComplete = (accountId: number | null) => {
         apolloClient.resetStore();
     };
 
     const isAccountsPage = location.pathname.includes("accounts");
+    const isReportsPage = location.pathname.includes("reports");
 
     const buttons = (
         <ButtonGroup>
-            <ButtonGroup variant="segmented">
-                <Button size="large"
-                    url="/accounts"
-                    icon={FolderIcon}
-                    variant={isAccountsPage ? "primary" : "secondary"}>
-                    Accounts
-                </Button>
-                <Popover
-                    active={active === 'popover2'}
-                    preferredAlignment="right"
-                    activator={
-                        <Button
-                            size="large"
-                            onClick={toggleActive('popover2')}
-                            icon={ChevronDownIcon}
-                            accessibilityLabel="Account list"
-                            variant={isAccountsPage ? "primary" : "secondary"}
-                        />
-                    }
-                    autofocusTarget="first-node"
-                    onClose={toggleActive('popover2')}
-                >
-                    <ActionList
-                        actionRole="menuitem"
-                        items={actionListItems}
-                    />
-                </Popover>
-            </ButtonGroup>
+            <AccountsButton isAccountsPage={isAccountsPage} />
+            <ReportsButton isReportsPage={isReportsPage} />
             {
                 sections.map((section) => {
                     const url: string = section[2] as string;
@@ -96,7 +53,7 @@ export const Home: React.FC = () => {
 
     const currentThing = () => {
         if (accountId == "0") {
-            return <><br /><Text as="h2" variant="headingSm">All Accounts</Text></>
+            return <Text as="h2" variant="headingSm">All Accounts</Text>
         }
         if (accountId && accountsData) {
             const accountData = accountsData.accounts.find((a) => a.id === accountId);
@@ -108,7 +65,10 @@ export const Home: React.FC = () => {
                 </InlineStack>
             </>;
         }
-        return null;
+        if (isReportsPage) {
+            return <Text as="h2" variant="headingSm">Reports</Text>;
+        }
+        return <Text as="h2" variant="headingSm">Bankroll</Text>;
     }
 
     return (<>
