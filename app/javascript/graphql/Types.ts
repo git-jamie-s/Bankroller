@@ -22,7 +22,7 @@ export interface ImportRuleType {
 export interface CategoryType {
     id: string;
     budgetAmount?: number;
-    budgetPeriod?: number;
+    budgetPeriod?: PeriodEnum;
     created: Date;
 };
 

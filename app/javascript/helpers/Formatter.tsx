@@ -1,5 +1,6 @@
 import React, { ReactElement } from "react";
 import { Text } from "@shopify/polaris";
+import { CategoryType, PeriodEnum } from "../graphql/Types";
 
 export function FormatCAD(pennies: number): ReactElement {
     const CAD = new Intl.NumberFormat('en-CA', { style: "currency", currency: "CAD" });
@@ -22,4 +23,21 @@ export function WeekdayName(d: Date): string {
     const dd = new Date(d);
     const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     return dayNames[dd.getDay()];
+}
+
+export function annualBudget(category: CategoryType): number {
+    const ba = category.budgetAmount || 0;
+    switch (category.budgetPeriod) {
+        case PeriodEnum.Yearly:
+            return ba;
+        case PeriodEnum.Monthly:
+            return ba * 12;
+        case PeriodEnum.Weekly:
+            return ba * 52;
+        case PeriodEnum.TwoWeeks:
+            return ba * 26;
+        case PeriodEnum.TwiceMonthly:
+            return ba * 24;
+    }
+    return 0;
 }

@@ -9,5 +9,6 @@ module Types
     field :delete_scheduled_transaction, mutation: Mutations::DeleteScheduledTransaction
     field :create_scheduled_transaction, mutation: Mutations::CreateScheduledTransaction
     field :update_scheduled_transaction, mutation: Mutations::UpdateScheduledTransaction
+    field :update_category, mutation: Mutations::UpdateCategory
   end
 end
