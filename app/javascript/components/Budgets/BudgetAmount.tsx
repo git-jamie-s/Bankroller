@@ -47,10 +47,11 @@ export const BudgetAmount: React.FC<Props> = ({ editing, category }) => {
 
     const strAmount = (amount / 100.0).toFixed(2);
 
-    const setNewAmount = (v) => {
-        setAmount(Math.round(Number(v) * 100));
+    const setNewAmount = (amount) => {
+        var re = /[-]?\d*\.?\d{0,2}/;
+        const filtered = (amount.match(re) || []).join('');
+        setAmount(Number(filtered) * 100);
     };
-
     return <TextField label=""
         value={strAmount}
         onChange={setNewAmount}
