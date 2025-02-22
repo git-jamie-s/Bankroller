@@ -41,5 +41,7 @@ module Types
     def transaction_types
       Transaction.all.group(:transaction_type).pluck(:transaction_type).sort
     end
+
+    field :annual_summary, Types::AnnualSummaryReportType, null: false, resolver: Resolvers::AnnualSummaryResolver
   end
 end
