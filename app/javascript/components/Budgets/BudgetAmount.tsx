@@ -24,10 +24,13 @@ export const BudgetAmount: React.FC<Props> = ({ editing, category }) => {
         };
     }, []);
 
-    const [amount, setAmount] = useState<number>(0);
+    const [amount, setAmount] = useState<string>("0");
 
     const selectMe = () => {
-        setAmount(category.budgetAmount || 0);
+        const strAmount = category.budgetAmount ?
+            (category.budgetAmount / 100.0).toFixed(2) : "0";
+
+        setAmount(strAmount);
         editing.setter(category);
     }
 
@@ -42,19 +45,19 @@ export const BudgetAmount: React.FC<Props> = ({ editing, category }) => {
     }
 
     const onEditComplete = () => {
-        editing.setter({ ...editing.current, budgetAmount: amount });
-    }
-
-    const strAmount = (amount / 100.0).toFixed(2);
-
-    const setNewAmount = (amount) => {
         var re = /[-]?\d*\.?\d{0,2}/;
         const filtered = (amount.match(re) || []).join('');
-        setAmount(Number(filtered) * 100);
-    };
+        const num = (Number(filtered) * 100);
+        editing.setter({ ...editing.current, budgetAmount: num });
+    }
+
+    // const strAmount = (amount / 100.0).toFixed(2);
+
+    // const setNewAmount = (amount) => {
+    // };
     return <TextField label=""
-        value={strAmount}
-        onChange={setNewAmount}
+        value={amount}
+        onChange={setAmount}
         onBlur={onEditComplete}
         autoComplete="off"
         focused
