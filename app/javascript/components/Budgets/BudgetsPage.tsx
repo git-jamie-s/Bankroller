@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Button, Spinner, IndexTable, Frame } from "@shopify/polaris";
+import { Card, Button, Spinner, IndexTable, Text, InlineStack, Grid } from "@shopify/polaris";
 import { ArrowDownIcon, ArrowUpIcon } from "@shopify/polaris-icons";
 import { gql } from '@apollo/client';
 import { GQCategories } from "../../graphql/GQCategories";
@@ -10,6 +10,8 @@ import { CategoryType } from "../../graphql/Types";
 import { useFilterState } from "../../helpers/useFilterState";
 import { BudgetRow } from "./BudgetRow";
 import { GMUpdateCategory } from "../../graphql/GMUpdateCategory";
+import ChartComponent from "./BudgetChart";
+import './BudgetsPage.css';
 
 export const Budgets: React.FC = () => {
     const GET_ACCOUNTS = gql`
@@ -21,11 +23,12 @@ export const Budgets: React.FC = () => {
             }
         }`;
 
+    const [selectedCategory, setSelectedCategory] = React.useState<string | null>(null);
+
     const { categoriesData, loading, error } = GQCategories();
     const [updateCategory] = GMUpdateCategory();
 
     const sorting = useFilterState<string>("category asc");
-
 
     const onEditComplete = ((value) => {
         if (value) {
@@ -33,7 +36,6 @@ export const Budgets: React.FC = () => {
             updateCategory({ variables: { category: sliced } });
         }
     });
-    const editingPeriod = useFilterState<CategoryType | null>(null, onEditComplete);
     const editingAmount = useFilterState<CategoryType | null>(null, onEditComplete);
 
     if (loading) return <Spinner />;
@@ -67,7 +69,6 @@ export const Budgets: React.FC = () => {
         { id: 'annual', title: titleButton("Annual Budget", "annualAmount") },
     ];
 
-
     const rowMarkup = categoriesData.categories
         .filter((c) => c.id.startsWith("expenses"))
         .sort((a, b) => {
@@ -84,23 +85,32 @@ export const Budgets: React.FC = () => {
         })
         .map((c, index) => {
             const annual = annualBudget(c);
-            return (<BudgetRow category={c} index={index} editingPeriod={editingPeriod} editingAmount={editingAmount} />
+            return (<BudgetRow category={c} index={index} editingAmount={editingAmount} selectRow={setSelectedCategory} />
             );
         }
         );
+
     return (<>
         <Card>
-            <Frame>
-                <IndexTable
-                    resourceName={{ singular: "", plural: "" }}
-                    itemCount={200}
-                    selectable={false}
-                    hasZebraStriping
-                    headings={headings}
-                >
-                    {rowMarkup}
-                </IndexTable >
-            </Frame>
+            <Grid>
+                <Grid.Cell columnSpan={{ xs: 6, sm: 4, md: 4, lg: 8, xl: 8 }}>
+                    <IndexTable
+                        resourceName={{ singular: "", plural: "" }}
+                        itemCount={200}
+                        selectable={false}
+                        hasZebraStriping
+                        headings={headings}
+                    >
+                        {rowMarkup}
+                    </IndexTable >
+                </Grid.Cell>
+                {selectedCategory && (
+                    <Grid.Cell columnSpan={{ xs: 6, sm: 2, md: 2, lg: 4, xl: 4 }}>
+                        <div className="sticky-column">
+                            <ChartComponent category={selectedCategory} />
+                        </div>
+                    </Grid.Cell>)}
+            </Grid>
         </Card >
     </>);
 };

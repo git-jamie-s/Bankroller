@@ -10,17 +10,17 @@ export interface Props {
     category: CategoryType;
     index: number;
     editingAmount: StateOption<CategoryType | null>;
-    editingPeriod: StateOption<CategoryType | null>;
+    selectRow: (id: string) => void;
 }
 
-export const BudgetRow: React.FC<Props> = ({ category, index, editingAmount, editingPeriod }) => {
+export const BudgetRow: React.FC<Props> = ({ category, index, editingAmount, selectRow }) => {
     const annual = annualBudget(category);
 
     return (
-        <IndexTable.Row id={category.id} key={category.id} position={index}>
+        <IndexTable.Row id={category.id} key={category.id} position={index} onClick={() => selectRow(category.id)}>
             <IndexTable.Cell>{category.id}</IndexTable.Cell>
             <IndexTable.Cell>
-                <BudgetPeriod category={category} editing={editingPeriod} />
+                <BudgetPeriod category={category} />
             </IndexTable.Cell>
             <IndexTable.Cell>
                 <BudgetAmount category={category} editing={editingAmount} />

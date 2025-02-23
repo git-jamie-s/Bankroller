@@ -4,15 +4,15 @@ class Category < ApplicationRecord
 
   def annual_budget
     case (budget_period)
-    when "YEARLY"
+    when :yearly
       budget_amount
-    when "MONTHLY"
+    when :monthly
       budget_amount * 12
-    when "WEEKLY"
+    when :weekly
       budget_amount * 52
-    when "BIWEEKLY"
+    when :two_weeks
       budget_amount * 26
-    when "MONTHLYx2"
+    when :twice_monthly
       budget_amount * 24
     end
   end

@@ -12,7 +12,8 @@ export function GMUpdateCategory() {
     return useMutation(UPDATE_CATEGORY,
         {
             refetchQueries: [
-                'GetCategories'
+                'GetCategories',
+                'GetBudgetHistory'
             ]
         }
     );

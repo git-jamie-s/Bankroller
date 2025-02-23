@@ -43,5 +43,6 @@ module Types
     end
 
     field :annual_summary, Types::AnnualSummaryReportType, null: false, resolver: Resolvers::AnnualSummaryResolver
+    field :budget_history, [ Types::BudgetHistoryReportType ], null: false, resolver: Resolvers::BudgetHistoryResolver
   end
 end

@@ -1,5 +1,5 @@
 class ScheduledTransaction < ApplicationRecord
-  PERIODS = %w[WEEKLY BIWEEKLY MONTHLY MONTHLYx2 YEARLY].freeze
+  PERIODS = %w[weekly two_weeks monthly twice_monthly yearly].freeze
   WEEKEND_ADJUSTS = %w[NONE BEFORE AFTER CLOSEST].freeze
 
   belongs_to :account

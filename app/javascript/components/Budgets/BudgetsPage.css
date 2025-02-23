@@ -1,0 +1,11 @@
+.sticky-column {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.scrollable-table {
+    overflow-y: auto;
+    max-height: 100vh;
+}

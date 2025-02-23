@@ -11,11 +11,11 @@ CREATE TEMPORARY TABLE cat_lookup(
    bp bigint,
    budget_period varchar
 );
-INSERT INTO cat_lookup (bp, budget_period) VALUES (0, 'WEEKLY');
-INSERT INTO cat_lookup (bp, budget_period) VALUES (1, 'BIWEEKLY');
-INSERT INTO cat_lookup (bp, budget_period) VALUES (2, 'MONTHLY');
-INSERT INTO cat_lookup (bp, budget_period) VALUES (3, 'MONTHLYx2');
-INSERT INTO cat_lookup (bp, budget_period) VALUES (4, 'YEARLY');
+INSERT INTO cat_lookup (bp, budget_period) VALUES (0, 'weekly');
+INSERT INTO cat_lookup (bp, budget_period) VALUES (1, 'two_weeks');
+INSERT INTO cat_lookup (bp, budget_period) VALUES (2, 'monthly');
+INSERT INTO cat_lookup (bp, budget_period) VALUES (3, 'twice_monthly');
+INSERT INTO cat_lookup (bp, budget_period) VALUES (4, 'yearly');
 
 INSERT into categories (id, budget_amount, budget_period)
     SELECT category, budget_amount, catl.budget_period FROM category INNER JOIN cat_lookup catl ON (category.budget_period = catl.bp);
@@ -35,10 +35,20 @@ INSERT into import_rules(id, amount, description, transaction_type, category_id,
 
 SELECT setval(pg_get_serial_sequence('import_rules', 'id'), max(id)) FROM import_rules;
 
+CREATE TEMPORARY TABLE shed_lookup(
+   p varchar,
+   period varchar
+);
+INSERT INTO shed_lookup (p, period) VALUES ('WEEKLY', 'weekly');
+INSERT INTO shed_lookup (p, period) VALUES ('BIWEEKLY', 'two_weeks');
+INSERT INTO shed_lookup (p, period) VALUES ('MONTHLY', 'monthly');
+INSERT INTO shed_lookup (p, period) VALUES ('MONTHLYx2', 'twice_monthly');
+INSERT INTO shed_lookup (p, period) VALUES ('YEARLY', 'yearly');
+
 INSERT INTO scheduled_transactions
   (id, account_id, transaction_type, description, min_amount, period, weekend_adjust, start_date)
-  SELECT scheduledtransaction_id, account_id, transaction_type, description, amount, period, weekend_adjust, start_date
-  FROM scheduledtransaction;
+  SELECT scheduledtransaction_id, account_id, transaction_type, description, amount, shed_lookup.period, weekend_adjust, start_date
+  FROM scheduledtransaction INNER JOIN shed_lookup ON (scheduledtransaction.period = shed_lookup.p);
 
 SELECT setval(pg_get_serial_sequence('scheduled_transactions', 'id'), max(id)) FROM scheduled_transactions;
 

@@ -1,7 +1,7 @@
 class Types::PeriodEnum < Types::BaseEnum
-  value("Weekly", value: "WEEKLY")
-  value("TwoWeeks", value: "BIWEEKLY")
-  value("Monthly", value: "MONTHLY")
-  value("TwiceMonthly", value: "MONTHLYx2")
-  value("Yearly", value: "YEARLY")
+  value("Weekly", value: "weekly")
+  value("TwoWeeks", value: "twoweeks")
+  value("Monthly", value: "monthly")
+  value("TwiceMonthly", value: "twice_monthly")
+  value("Yearly", value: "yearly")
 end
