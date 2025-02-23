@@ -85,33 +85,30 @@ export const Budgets: React.FC = () => {
         })
         .map((c, index) => {
             const annual = annualBudget(c);
-            return (<BudgetRow category={c} index={index} editingAmount={editingAmount} selectRow={setSelectedCategory} />
-            );
+            return (<BudgetRow category={c} index={index} editingAmount={editingAmount} selectRow={setSelectedCategory} />);
         }
         );
 
     return (<>
-        <Card>
-            <Grid>
-                <Grid.Cell columnSpan={{ xs: 6, sm: 4, md: 4, lg: 8, xl: 8 }}>
-                    <IndexTable
-                        resourceName={{ singular: "", plural: "" }}
-                        itemCount={200}
-                        selectable={false}
-                        hasZebraStriping
-                        headings={headings}
-                    >
-                        {rowMarkup}
-                    </IndexTable >
-                </Grid.Cell>
-                {selectedCategory && (
-                    <Grid.Cell columnSpan={{ xs: 6, sm: 2, md: 2, lg: 4, xl: 4 }}>
-                        <div className="sticky-column">
-                            <ChartComponent category={selectedCategory} />
-                        </div>
-                    </Grid.Cell>)}
-            </Grid>
-        </Card >
+        <Grid>
+            <Grid.Cell columnSpan={{ xs: 6, sm: 4, md: 4, lg: 8, xl: 8 }}>
+                <IndexTable
+                    resourceName={{ singular: "", plural: "" }}
+                    itemCount={200}
+                    selectable={false}
+                    hasZebraStriping
+                    headings={headings}
+                >
+                    {rowMarkup}
+                </IndexTable >
+            </Grid.Cell>
+            {selectedCategory && (
+                <Grid.Cell columnSpan={{ xs: 6, sm: 2, md: 2, lg: 4, xl: 4 }}>
+                    <div className="sticky-column">
+                        <ChartComponent category={selectedCategory} />
+                    </div>
+                </Grid.Cell>)}
+        </Grid>
     </>);
 };
 
