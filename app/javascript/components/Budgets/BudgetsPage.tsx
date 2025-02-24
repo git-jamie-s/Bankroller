@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Button, Spinner, IndexTable, Text, InlineStack, Grid } from "@shopify/polaris";
+import { Button, Spinner, IndexTable, Grid } from "@shopify/polaris";
 import { ArrowDownIcon, ArrowUpIcon } from "@shopify/polaris-icons";
 import { gql } from '@apollo/client';
 import { GQCategories } from "../../graphql/GQCategories";

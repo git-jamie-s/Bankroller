@@ -15,7 +15,7 @@ export const BudgetPeriod: React.FC<Props> = ({ category }) => {
     const options = [
         { value: PeriodEnum.Weekly, label: "Weekly" },
         { value: PeriodEnum.TwoWeeks, label: "Two weeks" },
-        { value: PeriodEnum.TwiceMonthly, label: "Twice Monthly" },
+        // { value: PeriodEnum.TwiceMonthly, label: "Twice Monthly" },
         { value: PeriodEnum.Monthly, label: "Monthly" },
         { value: PeriodEnum.Yearly, label: "Yearly" },
     ];

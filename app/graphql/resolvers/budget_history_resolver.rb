@@ -15,27 +15,31 @@ module Resolvers
         {
           start_date: Date.today.beginning_of_week - 24.weeks,
           date_format: "%b %d",
-          trunc: "week"
+          trunc: "week",
+          skip: 1.week
         }
       when "two_weeks"
         {
-          start_date: Date.today.beginning_of_week - 12.weeks,
+          start_date: Date.today.beginning_of_week - 24.weeks,
           date_format: "%b %d",
-          trunc: "week"
+          trunc: "week",
+          skip: 2.weeks
         }
       when "twice_monthly"
-        nil
+        raise GraphQL::Error("Twice monthly not supported for charting yet")
       when "monthly"
         {
           start_date: Date.today.beginning_of_month - 1.year,
           date_format: "%b",
-          trunc: "month"
+          trunc: "month",
+          skip: 1.month
         }
       when "yearly"
         {
           start_date: Date.today.beginning_of_year - 3.years,
           date_format: "%Y",
-          trunc: "year"
+          trunc: "year",
+          skip: 1.year
         }
       end.with_indifferent_access
 
@@ -44,7 +48,7 @@ module Resolvers
         .where(date: things[:start_date]..Date.today)
         .group("date_trunc('#{things[:trunc]}', date)")
         .sum(:amount)
-        .sort { |a, b| a[0] <=> b[0] }
+        .transform_keys { |k| k.to_date }
 
       if period == "two_weeks"
         # Merge every 2 weeks together
@@ -59,19 +63,29 @@ module Resolvers
           amount += new_sums[date] || 0
           new_sums[date] = amount
         end
-
-        puts "old sums: #{sums}"
-        puts "new sums: #{new_sums}"
         sums = new_sums
       end
 
-      sums.map do |date, amount|
-        {
-          date: date.strftime(things[:date_format]),
-          amount: amount,
-          budget: category.budget_amount
-        }
+      # Fill in any periods that don't have an amount.
+      puts sums
+      date = things[:start_date]
+      if period == "two_weeks" && date.cweek & 1 == 1
+        date -= 1.week
       end
+      while date < Date.today
+        sums[date] ||= 0
+        date += things[:skip]
+      end
+
+      sums
+        .sort { |a, b| a[0] <=> b[0] }
+        .map do |date, amount|
+          {
+            date: date.strftime(things[:date_format]),
+            amount: amount,
+            budget: category.budget_amount
+          }
+        end
     end
   end
 end
