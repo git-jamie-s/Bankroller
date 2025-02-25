@@ -7,10 +7,10 @@ export function FormatCAD(pennies: number): ReactElement {
 
     const str = CAD.format(Math.abs(pennies) / 100);
     if (pennies < 0) {
-        return (<Text as="p" tone="critical">({str})</Text>);
+        return (<Text as="span" tone="critical">({str})</Text>);
     }
     else {
-        return (<Text as="p" tone="success">{str}</Text>);
+        return (<Text as="span" tone="success">{str}</Text>);
     }
 }
 

@@ -15,6 +15,11 @@ export function GQAnnualSummary(reportYear: number | undefined) {
                     annualBudget
                     spent
                 }
+                annualTotals {
+                    year
+                    spent 
+                    budget
+                }
             }
         }`;
 
