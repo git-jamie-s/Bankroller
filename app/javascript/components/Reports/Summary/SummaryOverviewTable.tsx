@@ -1,22 +1,36 @@
-import React, { useState } from "react";
-import { Card, Text, Spinner, InlineStack, TextField, ColumnContentType, IndexTable, DataTable, Grid } from "@shopify/polaris";
-import { NonEmptyArray } from "@shopify/polaris/build/ts/src/types";
-import { IndexTableHeading } from "@shopify/polaris/build/ts/src/components/IndexTable";
+import React from "react";
+import { DataTable, Grid, TextField } from "@shopify/polaris";
 import { FormatCAD } from "../../../helpers/Formatter";
 import SummaryBarChart from "./SummaryBarChart";
+import { StateOption } from "../../../helpers/useFilterState";
 
 interface Props {
-    summary: any
+    summary: any,
+    year: StateOption<number>
 }
 
-
-export const SummaryOverviewTable: React.FC<Props> = ({ summary }) => {
+export const SummaryOverviewTable: React.FC<Props> = ({ summary, year }) => {
 
     const headings = [];
 
     const consummage = (-100 * summary.totalSpent / summary.totalBudget).toFixed(0);
+    const yearInput =
+        <div style={{ textAlign: "right" }}>
+            <div style={{ maxWidth: 200, float: "right" }}>
+                <TextField
+                    maxLength={4}
+                    align="right"
+                    label=""
+                    autoComplete="off"
+                    value={year.current.toString()}
+                    type="number"
+                    onChange={(v) => year.setter(Number(v))}
+                    size="slim"
+                    autoSize />
+            </div>
+        </div>;
     const rows = [
-        ["Report Year", summary.reportYear],
+        ["Report Year", yearInput],
         ["Annual Budget", FormatCAD(summary.totalBudget)],
         ["Expenses", FormatCAD(summary.totalSpent)],
         ["Annual Budget Consumed", `${consummage}%`]
