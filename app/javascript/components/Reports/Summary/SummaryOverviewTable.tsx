@@ -1,33 +1,43 @@
-import React from "react";
+import React, { useRef } from "react";
 import { DataTable, Grid, TextField } from "@shopify/polaris";
 import { FormatCAD } from "../../../helpers/Formatter";
 import SummaryBarChart from "./SummaryBarChart";
 import { StateOption } from "../../../helpers/useFilterState";
+import debounce from "lodash.debounce";
 
 interface Props {
     summary: any,
     year: StateOption<number>
 }
+const DEBOUNCE_TIME = 500;
 
 export const SummaryOverviewTable: React.FC<Props> = ({ summary, year }) => {
 
     const headings = [];
+    const [localYear, setLocalYear] = React.useState<number>(year.current);
 
     const consummage = (-100 * summary.totalSpent / summary.totalBudget).toFixed(0);
+
+    const debouncedSetYear = useRef<any>(
+        debounce((nextValue) => { year.setter(nextValue) }, DEBOUNCE_TIME)
+    ).current;
+
+    const setLocalYearDebounce = (v) => {
+        setLocalYear(v);
+        debouncedSetYear(v);
+    };
+
     const yearInput =
-        <div style={{ textAlign: "right" }}>
-            <div style={{ maxWidth: 200, float: "right" }}>
-                <TextField
-                    maxLength={4}
-                    align="right"
-                    label=""
-                    autoComplete="off"
-                    value={year.current.toString()}
-                    type="number"
-                    onChange={(v) => year.setter(Number(v))}
-                    size="slim"
-                    autoSize />
-            </div>
+        <div style={{ maxWidth: 150, float: "right" }}>
+            <TextField
+                maxLength={4}
+                align="right"
+                label=""
+                autoComplete="off"
+                value={localYear.toString()}
+                type="number"
+                onChange={(v) => setLocalYearDebounce(Number(v))}
+            />
         </div>;
     const rows = [
         ["Report Year", yearInput],

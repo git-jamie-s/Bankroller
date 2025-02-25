@@ -37,12 +37,11 @@ module Resolvers
         spent: nocat
       }
 
-
       annual_totals = []
       4.times do |i|
         year = report_start_time.year - i
         # Only include budget for the current year
-        budget = i == 0 && report_year == current_year ? total_budget : nil
+        budget = year == current_year ? total_budget : nil
         annual_totals << {
           year:,
           budget:,
