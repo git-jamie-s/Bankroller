@@ -81,9 +81,8 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    database: bankroller_production
-    username: bankroller
-    password: <%= ENV["BANKROLLER_DATABASE_PASSWORD"] %>
+    url: <%= ENV['DATABASE_URL'] %>
+    host: postgres
   cache:
     <<: *primary_production
     database: bankroller_production_cache

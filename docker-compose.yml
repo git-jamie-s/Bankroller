@@ -1,0 +1,45 @@
+services:
+  postgres:
+    build: docker/database/.
+    volumes:
+      - pgdata:/tmp/docker_pg_data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - BANKROLL_PW=whatever
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    # ports:
+    #  - "5432:6432"
+
+  bankroller:
+    build: .
+    environment:
+      - DATABASE_URL=postgres://bankroll:whatever@postgres/bankroll
+      - SECRET_KEY_BASE=b1ea9db578fbf93c01aef3fa4df6fe0230d80e73990cfa52fc1f53aac0d44cf82b44d4880bbd5da961116bab7f7e3c5049ede3686754a98b340a0e91489ad9c5
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "23000:3000"
+      - "23080:80"
+
+  # bash:
+  #   build: .
+  #   command: bash
+  #   environment:
+  #     - DATABASE_URL=postgres://bankroll:whatever@postgres/bankroll
+  #     - SECRET_KEY_BASE=b1ea9db578fbf93c01aef3fa4df6fe0230d80e73990cfa52fc1f53aac0d44cf82b44d4880bbd5da961116bab7f7e3c5049ede3686754a98b340a0e91489ad9c5
+  #   stdin_open: true
+  #   tty: true
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+      
+
+volumes:
+  pgdata:

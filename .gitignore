@@ -40,3 +40,5 @@
 
 # Ignore testing bank statements
 /*.qfx
+
+/config/credentials/production.key
