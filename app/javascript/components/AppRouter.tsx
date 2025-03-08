@@ -8,6 +8,7 @@ import Accounts from "./Accounts/Accounts";
 import AccountPage from "./Accounts/Account/AccountPage";
 import BudgetsPage from "./Budgets/BudgetsPage";
 import ImportRulesPage from "./ImportRules/ImportRulesPage";
+import ScheduledTransactionsPage from "./Schedule/ScheduledTransactionsPage";
 
 
 export default props => (
@@ -18,9 +19,7 @@ export default props => (
                 <Route path="accounts/:account" element={<AccountPage />} />
                 <Route path="budgets" element={<BudgetsPage />} />
                 <Route path="rules" element={<ImportRulesPage />} />
-                {/*}
                 <Route path="schedule" element={<ScheduledTransactionsPage />} />
-                */}
                 <Route path="reports" element={<Reports />}>
                     <Route path="summary" element={<Summary />} />
                 </Route>

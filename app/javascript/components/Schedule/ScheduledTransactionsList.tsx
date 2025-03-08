@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Button, Frame, Icon, IndexTable, SkeletonPage, Toast } from "@shopify/polaris";
-import { NonEmptyArray } from "@shopify/polaris/build/ts/src/types";
-import { IndexTableHeading } from "@shopify/polaris/build/ts/src/components/IndexTable";
-import { ArrowUpIcon, ArrowDownIcon, ButtonIcon } from '@shopify/polaris-icons';
 import { StateOption, useFilterState } from "../../helpers/useFilterState";
 import { ScheduledTransactionType } from "../../graphql/Types";
 import { ScheduledTransactionRow } from "./ScheduledTransactionRow";
 import { GMUpdateScheduledTransaction } from "../../graphql/GMUpdateScheduledTransaction";
+import { CircularProgress, Snackbar, Table } from "@mui/joy";
+import SortTableHead from "../../helpers/SortTableHead";
 
 interface Props {
     loading?: boolean;
@@ -16,6 +14,8 @@ interface Props {
 
 export const ScheduledTransactionsList: React.FC<Props> = ({ loading, sorting, scheduledTransactionArray }) => {
     const desc = sorting.current.includes(" desc");
+    const sortCol = sorting.current.split(" ")[0];
+
     const array = scheduledTransactionArray;
 
     useEffect(() => {
@@ -61,27 +61,16 @@ export const ScheduledTransactionsList: React.FC<Props> = ({ loading, sorting, s
         sorting.setter(newSortVal);
     }
 
-    const dirIcon = desc ? ArrowDownIcon : ArrowUpIcon;
-    function titleButton(label: string, sortVal: string) {
-        const icon = (sorting.current.startsWith(sortVal)) ? dirIcon : undefined;
-        return <Button variant="tertiary"
-            fullWidth
-            textAlign="left"
-            icon={icon}
-            onClick={() => handleSortClick(sortVal)}>{label}
-        </Button>;
-    }
-
-    const headings: NonEmptyArray<IndexTableHeading> = [
-        { id: "buttons", title: <Icon source={ButtonIcon} /> },
-        { id: 'description', title: titleButton("Description", "description") },
-        { id: 'type', title: titleButton("Transaction Type", "transaction_type") },
-        { id: 'minAmount', title: titleButton("Min amount", "min_amount") },
-        { id: 'maxAmount', title: titleButton("Max amount", "max_amount") },
-        { id: 'account', title: titleButton("Account", "account.account_name") },
-        { id: 'schedule', title: "Schedule" },
-        { id: 'w_a', title: "Weekend Adjust" },
-        { id: 'startDate', title: "Start Date" },
+    const headings = [
+        { id: "buttons", label: "", nosort: true },
+        { id: 'description', label: "Description" },
+        { id: 'type', label: "Transaction Type" },
+        { id: 'min_amount', label: "Min amount" },
+        { id: 'max_amount', label: "Max amount" },
+        { id: 'account.account_name', label: "Account" },
+        { id: 'schedule', label: "Schedule", nosort: true },
+        { id: 'w_a', label: "Weekend Adjust", nosort: true },
+        { id: 'startDate', label: "Start Date", nosort: true },
     ];
 
     const rowMarkup = array.map(
@@ -97,25 +86,34 @@ export const ScheduledTransactionsList: React.FC<Props> = ({ loading, sorting, s
     );
 
     const toastMarkup = toastMessage ? (
-        <Toast content={toastMessage} onDismiss={() => { setToastMessage(null) }} duration={2000} />
+        <Snackbar open={true}
+            onClose={() => { setToastMessage(null) }}
+            autoHideDuration={2000}>
+            {toastMessage}
+        </Snackbar>
     ) : null;
 
     if (loading) {
-        return <SkeletonPage />;
+        return <CircularProgress />;
     }
 
     return (
-        <Frame>
-            <IndexTable
-                headings={headings}
-                itemCount={array.length}
-                selectable={false}
-                hasZebraStriping
+        <>
+            <Table
+                stickyHeader
             >
-                {rowMarkup}
-            </IndexTable>
+                <SortTableHead
+                    headCells={headings}
+                    onRequestSort={handleSortClick}
+                    order={desc ? "desc" : "asc"}
+                    orderBy={sortCol}
+                />
+                <tbody>
+                    {rowMarkup}
+                </tbody>
+            </Table >
             {toastMarkup}
-        </Frame>
+        </>
     );
 };
 

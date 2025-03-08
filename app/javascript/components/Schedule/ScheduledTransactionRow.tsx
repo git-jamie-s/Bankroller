@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { Button, IndexTable, TextField } from "@shopify/polaris";
-import { DeleteIcon } from '@shopify/polaris-icons';
 import { FormatAmountString, FormatCAD } from "../../helpers/Formatter";
 import { StateOption } from "../../helpers/useFilterState";
 import { ScheduledTransactionType } from "../../graphql/Types";
 import { GMDeleteScheduledTransaction } from "../../graphql/GMDeleteScheduledTransaction";
+import { Delete } from "@mui/icons-material";
+import { Button, IconButton, Input } from "@mui/joy";
 
 interface Props {
     index: number;
@@ -40,9 +40,8 @@ export const ScheduledTransactionRow: React.FC<Props> = ({ index, scheduledTrans
         const minAmountStr = FormatAmountString(scheduledTransaction.minAmount);
         if (editingMinAmount?.current !== scheduledTransaction) {
             return <Button
+                variant="plain"
                 fullWidth
-                textAlign="start"
-                variant="tertiary"
                 onClick={() => {
                     editingMaxAmount.setter(null);
                     editingMinAmount.setter(scheduledTransaction);
@@ -51,13 +50,14 @@ export const ScheduledTransactionRow: React.FC<Props> = ({ index, scheduledTrans
                 {minAmountStr}
             </Button>;
         }
-        return <TextField
-            size="slim"
-            label="Amount"
+        return <Input
+            size="sm"
+            placeholder="Amount"
             type="currency"
-            autoComplete="off"
             autoFocus
-            onChange={(value) => { setMinAmount(filter(value)) }}
+            onChange={(event) => {
+                console.log("Setting min amount: ", event.target.value); setMinAmount(filter(event.target.value))
+            }}
             value={minAmount}
             onBlur={() => {
                 editingMinAmount.setter({ ...scheduledTransaction, minAmount: Number(minAmount) * 100 });
@@ -68,21 +68,18 @@ export const ScheduledTransactionRow: React.FC<Props> = ({ index, scheduledTrans
     const startDate = scheduledTransaction.startDate.toString();
 
     return (
-        <IndexTable.Row
-            id={scheduledTransaction.id}
-            key={scheduledTransaction.id}
-            position={index}>
-            <IndexTable.Cell>
-                <Button icon={DeleteIcon} onClick={() => onDelete(scheduledTransaction)} />
-            </IndexTable.Cell>
-            <IndexTable.Cell>{scheduledTransaction.description}</IndexTable.Cell>
-            <IndexTable.Cell>{scheduledTransaction.transactionType}</IndexTable.Cell>
-            <IndexTable.Cell>{minAmountCell()}</IndexTable.Cell>
-            <IndexTable.Cell>{max_amount}</IndexTable.Cell>
-            <IndexTable.Cell>{accountName}</IndexTable.Cell>
-            <IndexTable.Cell>{scheduledTransaction.period}</IndexTable.Cell>
-            <IndexTable.Cell>{scheduledTransaction.weekendAdjust}</IndexTable.Cell>
-            <IndexTable.Cell>{startDate}</IndexTable.Cell>
-        </IndexTable.Row>
+        <tr key={scheduledTransaction.id}>
+            <td>
+                <IconButton onClick={() => onDelete(scheduledTransaction)} ><Delete /></IconButton>
+            </td>
+            <td>{scheduledTransaction.description}</td>
+            <td>{scheduledTransaction.transactionType}</td>
+            <td>{minAmountCell()}</td>
+            <td>{max_amount}</td>
+            <td>{accountName}</td>
+            <td>{scheduledTransaction.period}</td>
+            <td>{scheduledTransaction.weekendAdjust}</td>
+            <td>{startDate}</td>
+        </tr>
     );
 };

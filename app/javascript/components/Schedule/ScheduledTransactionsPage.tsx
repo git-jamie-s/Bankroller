@@ -1,9 +1,8 @@
 import React, { } from "react";
-import { Card, Text } from "@shopify/polaris";
 import { useFilterState } from "../../helpers/useFilterState";
-import { AmountLimit } from "../Accounts/Account/TransactionFilter/AmountFilter";
 import { GQScheduledTransactions } from "../../graphql/GQScheduledTransactions";
 import { ScheduledTransactionsList } from "./ScheduledTransactionsList";
+import { Card, Typography } from "@mui/joy";
 
 export const ScheduledTransactionsPage: React.FC = () => {
 
@@ -33,7 +32,7 @@ export const ScheduledTransactionsPage: React.FC = () => {
 
     return (<>
         <Card>
-            <Text as="h1">Scheduled Transactions</Text>
+            <Typography component="h1">Scheduled Transactions</Typography>
             <br />
             {/* <TransactionFilter
                 query={query}
