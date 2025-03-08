@@ -1,7 +1,7 @@
 import React from "react";
-import { ChoiceList } from '@shopify/polaris';
 import { GQTransactionTypes } from "../../../../graphql/GQTransactionTypes";
 import { StateOption } from "../../../../helpers/useFilterState";
+import { Autocomplete } from "@mui/joy";
 
 interface Props {
     transactionTypes: StateOption<string[]>
@@ -15,13 +15,21 @@ export const TransactionTypeChoiceList: React.FC<Props> = ({ transactionTypes })
         return { label: tt, value: tt };
     })
 
+    const onChange = (event, v) => {
+        transactionTypes.setter(v);
+    }
+
     return (
-        <ChoiceList
-            choices={choices}
+        <Autocomplete
+            sx={{ maxWidth: "200px" }}
+            size="sm"
+            multiple
+            options={data}
             title="Types"
-            selected={transactionTypes.current}
-            onChange={transactionTypes.setter}
-            allowMultiple />
+            onChange={onChange}
+            value={transactionTypes.current}
+            placeholder="Transaction Type"
+        />
     );
 
 }

@@ -1,5 +1,4 @@
 import React from "react";
-import { LegacyStack, Tag, Autocomplete, Spinner, BlockStack } from '@shopify/polaris';
 import { useState, useCallback, useMemo } from 'react';
 import { GQCategories } from "../../../../graphql/GQCategories";
 import { StateOption } from "../../../../helpers/useFilterState";

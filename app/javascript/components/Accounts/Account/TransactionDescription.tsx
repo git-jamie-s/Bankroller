@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { TransactionType } from "../../../graphql/Types";
-import { Button, TextField } from "@shopify/polaris";
 import { StateOption } from "../../../helpers/useFilterState";
+import { Button, Input } from "@mui/joy";
 
 interface Props {
     editing: StateOption<TransactionType | null>;
@@ -35,22 +35,21 @@ export const TransactionDescription: React.FC<Props> = ({ editing, transaction }
 
     if (editing.current !== transaction) {
         return <Button
+            variant="plain"
+            size="sm"
+            color="neutral"
             fullWidth
-            textAlign="start"
-            variant="tertiary"
-            onClick={selectMe}>
+            onClick={selectMe}
+            sx={{ display: 'block', textAlign: 'start', fontWeight: "normal", padding: "1px" }}>
             {transaction.description}
         </Button>;
     }
 
     return (
-        <TextField
-            onChange={setText}
-            label="Description"
-            labelHidden
+        <Input
+            fullWidth
+            size="sm"
             value={text}
-            autoComplete="off"
-            variant="borderless"
             autoFocus
             onBlur={onEditComplete}
         />

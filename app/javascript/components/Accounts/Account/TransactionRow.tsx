@@ -1,11 +1,9 @@
 import React from "react";
-import { Text, IndexTable, Button, Popover, ActionList } from "@shopify/polaris";
 import { FormatCAD } from "../../../helpers/Formatter";
 import { TransactionType } from "../../../graphql/Types";
+import { StateOption } from "../../../helpers/useFilterState";
 import { TransactionDescription } from "./TransactionDescription";
 import { TransactionCategory } from "./TransactionCategory";
-import { StateOption } from "../../../helpers/useFilterState";
-import { ChevronDownIcon } from "@shopify/polaris-icons";
 
 interface Props {
     index: number;
@@ -13,7 +11,7 @@ interface Props {
     includeAccount: boolean;
     includeBalance: boolean;
     editingDescription: StateOption<TransactionType | null>;
-    editingCategory: StateOption<TransactionType | null>;
+    setTransactionCategory: (id, category) => void;
     onCreateRule: (transaction) => void;
     onScheduleTransaction: (transaction) => void;
 };
@@ -23,7 +21,7 @@ export const TransactionRow: React.FC<Props> = ({ index,
     includeAccount,
     includeBalance,
     editingDescription,
-    editingCategory,
+    setTransactionCategory,
     onCreateRule,
     onScheduleTransaction }) => {
     const amount = FormatCAD(transaction.amount);
@@ -52,64 +50,49 @@ export const TransactionRow: React.FC<Props> = ({ index,
         setActive((activeId) => (activeId !== id ? id : null));
     };
 
-    const menu = transaction.categoryId && (
-        <Popover
-            active={popId === active}
-            preferredAlignment="right"
-            activator={
-                <Button
-                    fullWidth={false}
-                    size="slim"
-                    onClick={toggleMenuActive(popId)}
-                    icon={ChevronDownIcon}
-                    accessibilityLabel="Account list"
-                />
-            }
-            autofocusTarget="first-node"
-            onClose={toggleMenuActive(popId)}
-        >
-            <ActionList
-                actionRole="menuitem"
-                items={actionItems}
-            />
-        </Popover>
-    );
+    // const menu = transaction.categoryId && (
+    //     <Popover
+    //         active={popId === active}
+    //         preferredAlignment="right"
+    //         activator={
+    //             <Button
+    //                 fullWidth={false}
+    //                 size="slim"
+    //                 onClick={toggleMenuActive(popId)}
+    //                 icon={ChevronDownIcon}
+    //                 accessibilityLabel="Account list"
+    //             />
+    //         }
+    //         autofocusTarget="first-node"
+    //         onClose={toggleMenuActive(popId)}
+    //     >
+    //         <ActionList
+    //             actionRole="menuitem"
+    //             items={actionItems}
+    //         />
+    //     </Popover>
+    // );
 
 
     const accountCell = includeAccount && (
-        <IndexTable.Cell>{transaction.account.accountName}</IndexTable.Cell>
+        <td>{transaction.account.accountName}</td>
     );
     const balanceCell = includeBalance && (
-        <IndexTable.Cell>
-            <Text as="span" alignment="end" numeric>
-                {balance}
-            </Text>
-        </IndexTable.Cell>
+        <td>{balance}</td>
     );
 
-
-
+    const setCategory = ((v) => setTransactionCategory(transaction.id, v));
     return (
-        <>
-            <IndexTable.Row id={transaction.id} key={transaction.id} position={index}>
-                <IndexTable.Cell>{menu}</IndexTable.Cell>
-                {accountCell}
-                <IndexTable.Cell>{transaction.date.toString()}</IndexTable.Cell>
-                <IndexTable.Cell>{transaction.transactionType}</IndexTable.Cell>
-                <IndexTable.Cell>
-                    <TransactionDescription transaction={transaction} editing={editingDescription} />
-                </IndexTable.Cell>
-                <IndexTable.Cell>
-                    <TransactionCategory index={index} transaction={transaction} editing={editingCategory} />
-                </IndexTable.Cell>
-                <IndexTable.Cell>
-                    <Text as="span" alignment="end" numeric>
-                        {amount}
-                    </Text>
-                </IndexTable.Cell>
-                {balanceCell}
-            </IndexTable.Row>
-        </>
+        <tr>
+            <td></td>
+            {accountCell}
+            <td>{transaction.date.toString()}</td>
+            <td>{transaction.transactionType}</td>
+            <td><TransactionDescription transaction={transaction} editing={editingDescription} /></td>
+            <td><TransactionCategory currentCategory={transaction.categoryId} setTransactionCategory={setCategory} /></td>
+            <td>{amount}</td>
+            {balanceCell}
+        </tr>
     )
 
 };

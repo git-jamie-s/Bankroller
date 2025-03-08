@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react"
-import { Button, Select, TextField } from "@shopify/polaris";
 import { CategoryType, PeriodEnum } from "../../graphql/Types";
 import { StateOption } from "../../helpers/useFilterState";
 import { FormatAmountString, FormatCAD } from "../../helpers/Formatter";
+import { Button, Input } from "@mui/joy";
 
 
 interface Props {
@@ -37,9 +37,8 @@ export const BudgetAmount: React.FC<Props> = ({ editing, category }) => {
     if (editing.current !== category) {
         return <Button
             fullWidth
-            textAlign="start"
-            variant="tertiary"
-            onClick={selectMe}>
+            onClick={selectMe}
+            variant="plain">
             {FormatAmountString(category.budgetAmount || 0)}
         </Button>;
     }
@@ -51,15 +50,12 @@ export const BudgetAmount: React.FC<Props> = ({ editing, category }) => {
         editing.setter({ ...editing.current, budgetAmount: num });
     }
 
-    // const strAmount = (amount / 100.0).toFixed(2);
+    const onSetAmount = ((event) => setAmount(event.target.value));
 
-    // const setNewAmount = (amount) => {
-    // };
-    return <TextField label=""
+    return <Input
+        fullWidth
         value={amount}
-        onChange={setAmount}
+        onChange={onSetAmount}
         onBlur={onEditComplete}
-        autoComplete="off"
-        focused
     />;
 };

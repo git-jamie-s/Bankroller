@@ -1,16 +1,16 @@
 import React, { ReactElement } from "react";
-import { Text } from "@shopify/polaris";
 import { CategoryType, PeriodEnum } from "../graphql/Types";
+import { Typography } from "@mui/joy";
 
 export function FormatCAD(pennies: number): ReactElement {
     const CAD = new Intl.NumberFormat('en-CA', { style: "currency", currency: "CAD" });
 
     const str = CAD.format(Math.abs(pennies) / 100);
     if (pennies < 0) {
-        return (<Text as="span" tone="critical">({str})</Text>);
+        return (<Typography component="span" color="warning">({str})</Typography>);
     }
     else {
-        return (<Text as="span" tone="success">{str}</Text>);
+        return (<Typography component="span" color="success">{str}</Typography>);
     }
 }
 

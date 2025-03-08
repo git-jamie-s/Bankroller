@@ -1,5 +1,4 @@
 import React from "react";
-import { IndexTable } from "@shopify/polaris";
 import { annualBudget, FormatCAD } from "../../helpers/Formatter";
 import { CategoryType } from "../../graphql/Types";
 import { StateOption } from "../../helpers/useFilterState";
@@ -17,15 +16,15 @@ export const BudgetRow: React.FC<Props> = ({ category, index, editingAmount, sel
     const annual = annualBudget(category);
 
     return (
-        <IndexTable.Row id={category.id} key={category.id} position={index} onClick={() => selectRow(category.id)}>
-            <IndexTable.Cell>{category.id}</IndexTable.Cell>
-            <IndexTable.Cell>
+        <tr onClick={() => selectRow(category.id)}>
+            <td>{category.id}</td>
+            <td>
                 <BudgetPeriod category={category} />
-            </IndexTable.Cell>
-            <IndexTable.Cell>
+            </td>
+            <td>
                 <BudgetAmount category={category} editing={editingAmount} />
-            </IndexTable.Cell>
-            <IndexTable.Cell>{FormatCAD(annual)}</IndexTable.Cell>
-        </IndexTable.Row>
+            </td>
+            <td>{FormatCAD(annual)}</td>
+        </tr>
     );
 };

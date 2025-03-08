@@ -1,10 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Text, IndexTable, Button, Toast, Frame } from "@shopify/polaris";
 import { GQTransactions } from "../../../graphql/GQTransactions";
-import { TransactionFilter } from "./TransactionFilter/TransactionFilter";
-import { IndexTableHeading } from "@shopify/polaris/build/ts/src/components/IndexTable";
-import { NonEmptyArray } from "@shopify/polaris/build/ts/src/types";
-import { ArrowUpIcon, ArrowDownIcon } from '@shopify/polaris-icons';
 import { PageInfo, PaginationQueryParams } from "../../../graphql/PaginationType";
 import { useFilterState } from "../../../helpers/useFilterState";
 import { AmountLimit } from "./TransactionFilter/AmountFilter";
@@ -12,9 +7,11 @@ import { ImportRuleType, PeriodEnum, TransactionType, WeekendAdjustEnum } from "
 import { GMUpdateTransaction } from "../../../graphql/GMUpdateTransaction";
 import { TransactionRow } from "./TransactionRow";
 import { GMUpsertImportRule } from "../../../graphql/GMUpsertImportRule";
-import { ImportRuleEditDialog } from "../../ImportRules/ImportRuleEdit/ImportRuleEditDialog";
 import { GMCreateScheduledTransaction } from "../../../graphql/GMCreateScheduledTransaction";
-import { ScheduleTransactionDialog } from "./ScheduleTransactionDialog/ScheduleTransactionDialog";
+import SortTableHead from "../../../helpers/SortTableHead";
+import { Sheet, Snackbar, Table } from "@mui/joy";
+import Paginator from "./Paginator";
+import { TransactionFilter } from "./TransactionFilter/TransactionFilter";
 
 interface Props {
     account: any;
@@ -23,6 +20,8 @@ interface Props {
 export const Transactions: React.FC<Props> = ({ account }) => {
     const accountId = account.id;
     const [sort, setSort] = useState('date desc, id desc');
+    const sortCol = sort.split(" ")[0];
+
     const [updateTransaction] = GMUpdateTransaction();
     const [upsertImportRule, { data: updateData, error: updateError }] = GMUpsertImportRule();
     const [createScheduledTransaction, { data: createSchedTxData }] = GMCreateScheduledTransaction();
@@ -73,11 +72,11 @@ export const Transactions: React.FC<Props> = ({ account }) => {
     }
 
     const query = useFilterState<string>('', resetPagination);
-    const categories = useFilterState<string[]>([], resetPagination);
+    const category = useFilterState<string>('', resetPagination);
     const transactionTypes = useFilterState([] as string[], resetPagination);
     const amountLimit = useFilterState<AmountLimit>({ low: undefined, high: undefined, abs: true });
 
-    const pageNumber = useRef<number>(1);
+    const pageNumber = useRef<number>(0);
     const pageSize = useRef<number>(50);
     const [pagination, setPagination] = useState<PaginationQueryParams>({ first: pageSize.current });
 
@@ -88,20 +87,31 @@ export const Transactions: React.FC<Props> = ({ account }) => {
         }
     });
 
-    const editingTransactionCat = useFilterState<TransactionType | null>(null, onEditComplete);
+    const setTransactionCategory = (id, v) => {
+        const sliced = { id, categoryId: v };
+
+        updateTransaction({ variables: { transaction: sliced } })
+            .then(() => {
+                setToastMessage("Transaction saved");
+            }).catch((e) => setToastMessage(e.message));
+    }
+
     const editingTransactionDesc = useFilterState<TransactionType | null>(null, onEditComplete);
 
+    const categoryFilter = Boolean(category.current?.length) ? [category.current] : [];
     const { transactions, error } = GQTransactions(sort, accountId,
         query.current,
-        categories.current,
+        categoryFilter,
         transactionTypes.current,
         amountLimit.current,
         pagination);
     if (error) return <p>Error : {error.message}</p>;
 
+    const rowCount = transactions?.totalCount || 0;
+
     const pageInfo: PageInfo = transactions?.pageInfo || {}
 
-    const includeBalance = sort.startsWith("date");
+    const includeBalance = sortCol === "date";
     const includeAccount = accountId === "0";
 
     const rowMarkup = transactions?.edges.map(
@@ -114,7 +124,7 @@ export const Transactions: React.FC<Props> = ({ account }) => {
                 includeAccount={includeAccount}
                 includeBalance={includeBalance}
                 editingDescription={editingTransactionDesc}
-                editingCategory={editingTransactionCat}
+                setTransactionCategory={setTransactionCategory}
                 onCreateRule={onCreateRule}
                 onScheduleTransaction={onScheduleTransaction} />;
         }
@@ -136,42 +146,33 @@ export const Transactions: React.FC<Props> = ({ account }) => {
         resetPagination();
     }
 
-    const dirIcon = desc ? ArrowDownIcon : ArrowUpIcon;
-    function titleButton(label: string, sortVal: string) {
-        const icon = (sort.startsWith(sortVal)) ? dirIcon : undefined;
-        return <Button variant="tertiary"
-            fullWidth
-            textAlign="left"
-            icon={icon}
-            onClick={() => handleSortClick(sortVal)}>{label}
-        </Button>;
-    }
-
-    const headings: NonEmptyArray<IndexTableHeading> = [
-        { id: 'date', title: titleButton("Date", "date") },
-        { id: 'type', title: titleButton("Type", "transaction_type") },
-        { id: 'description', title: titleButton("Description", "description") },
-        { id: 'category', title: titleButton("Category", "category_id") },
-        { id: 'amount', title: titleButton("Amount", "amount") },
+    const headings: any[] = [
+        { id: 'date', label: "Date" },
+        { id: 'transaction_type', label: "Type" },
+        { id: 'description', label: "Description", width: "25%" },
+        { id: 'category_id', label: "Category", width: "25%" },
+        { id: 'amount', label: "Amount" },
     ];
 
     if (includeAccount) {
-        headings.unshift({ id: 'account', title: "Account" });
+        headings.unshift({ id: 'account', label: "Account", sort: false });
     }
-    headings.unshift({ id: 'actions', title: "" });
+    headings.unshift({ id: 'actions', label: "" });
 
     if (includeBalance) {
-        headings.push({
-            id: 'balance',
-            title: (
-                <Text as="span" alignment="end">
-                    Balance
-                </Text>
-            ),
-        } as IndexTableHeading);
+        headings.push({ id: 'balance', label: "Balance", sort: false });
     }
+    function widths() {
+        const w = {};
+        headings.forEach((h, index) => {
+            if (h.width) {
+                const propName = `& thead th:nth-child(${index + 1})`
+                w[propName] = { width: h.width };
+            }
+        });
+        return w;
+    };
 
-    const pageCount = Math.ceil((transactions?.totalCount || 0) / pageSize.current);
     const onNextPage = () => {
         pageNumber.current++;
         setPagination({ first: pageSize.current, after: pageInfo.endCursor || undefined })
@@ -181,17 +182,15 @@ export const Transactions: React.FC<Props> = ({ account }) => {
         setPagination({ last: pageSize.current, before: pageInfo.startCursor || undefined })
     }
 
-    const paginationInfo = {
-        hasNext: transactions?.pageInfo.hasNextPage,
-        hasPrevious: transactions?.pageInfo.hasPreviousPage,
-        onNext: onNextPage,
-        onPrevious: onPreviousPage,
-        type: "table",
-        label: `Page ${pageNumber.current} of ${pageCount}`
-    }
-
     const toastMarkup = toastMessage ? (
-        <Toast content={toastMessage} onDismiss={() => { setToastMessage(null) }} duration={2000} />
+        <Snackbar
+            open={true}
+            onClose={() => { setToastMessage(null) }}
+            autoHideDuration={1500}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+            {toastMessage}
+        </Snackbar >
     ) : null;
 
 
@@ -205,37 +204,60 @@ export const Transactions: React.FC<Props> = ({ account }) => {
         }).then(() => {
             setToastMessage("Transaction Scheduled");
             createSxTx.setter(null);
-        })
-            .catch((e) => { setToastMessage(e.message) });
+        }).catch((e) => {
+            setToastMessage(e.message)
+        });
     }
 
     return (
-        <Frame>
+        <>
             <TransactionFilter
                 query={query}
-                categories={categories}
+                category={category}
                 transactionTypes={transactionTypes}
                 amountLimit={amountLimit} />
-            <IndexTable
-                resourceName={resourceName}
-                itemCount={200}
-                selectable={false}
-                hasZebraStriping
-                headings={headings}
-                pagination={paginationInfo}
-            >
-                {rowMarkup}
-            </IndexTable >
-            <ImportRuleEditDialog
+            <Sheet>
+                <Table
+                    stripe="even"
+                    sx={widths()}
+                    size="sm"
+                    stickyHeader
+                    stickyFooter
+                >
+                    <SortTableHead
+                        onRequestSort={handleSortClick}
+                        order={desc ? "desc" : "asc"}
+                        orderBy={sortCol}
+                        headCells={headings}
+                    />
+                    <tbody>
+                        {rowMarkup}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colSpan={headings.length}>
+                                <Paginator
+                                    rowCount={rowCount}
+                                    rowsPerPage={pageSize}
+                                    page={pageNumber}
+                                    onPreviousPage={onPreviousPage}
+                                    onNextPage={onNextPage}
+                                />
+                            </td>
+                        </tr>
+                    </tfoot>
+                </Table>
+            </Sheet>
+            {/* <ImportRuleEditDialog
                 importRule={createRule}
                 onClose={() => { createRule.setter(null) }}
                 onSave={onSaveNewRule}
             />
             <ScheduleTransactionDialog transaction={createSxTx}
                 onClose={() => createSxTx.setter(null)}
-                onSave={handleScheduleTransaction} />
+                onSave={handleScheduleTransaction} /> */}
             {toastMarkup}
-        </Frame>
+        </>
     );
 };
 

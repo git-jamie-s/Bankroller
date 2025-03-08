@@ -1,7 +1,6 @@
 import React from 'react';
 import { XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { GQBudgetHistory } from '../../graphql/GQBudgetHistory';
-import { Text } from '@shopify/polaris';
 
 interface Props {
     category: string;
@@ -33,7 +32,7 @@ const ChartComponent: React.FC<Props> = ({ category }) => {
 
     return (
         <>
-            <Text as="h2">Budget Chart: {category}</Text>
+            <span>Budget Chart: {category}</span>
 
             <ResponsiveContainer width="100%" height={400}>
                 <BarChart

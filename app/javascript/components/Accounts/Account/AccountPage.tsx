@@ -1,8 +1,8 @@
 import React from "react";
-import { Card } from "@shopify/polaris";
 import { useParams } from "react-router";
 import { Transactions } from "./Transactions";
 import { GQAccount } from "../../../graphql/GQAccount";
+import { Card } from "@mui/joy";
 
 export const AccountPage: React.FC = () => {
     let params = useParams();

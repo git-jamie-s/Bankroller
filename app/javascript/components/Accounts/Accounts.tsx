@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { Card, Text, Spinner, ResourceList, ResourceItem, InlineStack, Icon, Button, TextField, Toast, Frame } from "@shopify/polaris";
-import { BookOpenIcon } from "@shopify/polaris-icons";
 import { GQAccounts } from "../../graphql/GQAccounts";
 import { AccountType } from "../../graphql/Types";
 import { GMUpdateAccountName } from "../../graphql/GMAccountName";
+import { Card, CircularProgress, List, ListItem, ListItemButton, ListItemContent, ListItemDecorator, Snackbar, Typography } from "@mui/joy";
+import TableViewIcon from '@mui/icons-material/TableView';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import { FormatCAD } from "../../helpers/Formatter";
 
 export const Accounts: React.FC = () => {
     const { loading, error, accountsData } = GQAccounts();
@@ -13,7 +15,7 @@ export const Accounts: React.FC = () => {
     const [updateAccountName, { }] = GMUpdateAccountName();
     const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-    if (loading) return <Spinner />;
+    if (loading) return <CircularProgress />;
     if (error) return <p>Error : {error.message}</p>;
 
     function editAccount(account) {
@@ -33,61 +35,42 @@ export const Accounts: React.FC = () => {
         setEditingAccount(null);
     }
 
-    function renderItem(account) {
-        const media = <Icon source={BookOpenIcon} />;
-        const isAllThat = account.id === "0";
-
-        const balance = isAllThat ? undefined : CAD.format(account.balance / 100);
-
-        if (editingAccount && account.id === editingAccount.id) {
-            return (<ResourceItem
-                key={account.id}
-                id={account.id}
-                media={media}
-                onClick={() => { }}
-                accessibilityLabel="Edit name of account">
-                <TextField
-                    label="Account Name"
-                    autoComplete="off"
-                    value={editingAccount?.accountName}
-                    onChange={(v) => { setEditingAccount({ ...editingAccount, accountName: v }) }}
-                    onBlur={() => saveAccount()} />
-            </ResourceItem>);
-        }
-
-        const shortcutActions = isAllThat || editingAccount !== null ? undefined : [{ content: 'Edit', onAction: () => editAccount(account) }];
-        return (
-            <ResourceItem
-                key={account.id}
-                shortcutActions={shortcutActions}
-                id={account.id}
-                url={"/accounts/" + account.id}
-                media={media}
-                accessibilityLabel={`View details for account ${account.name}`}
-            >
-                <Text variant="bodyMd" fontWeight="bold" as="h3">
-                    {account.accountName}
-                </Text>
-                <>{balance}</>
-            </ResourceItem>
-        );
-    }
     const accounts = accountsData.accounts.map(item => ({ ...item }));
     accounts.push({ id: "0", accountName: "all", balance: "" });
 
+    const accountItems = accounts.map((account) => {
+        const href = "/accounts/" + account.id;
+        return <ListItem>
+            <ListItemButton component="a" href={href}>
+                <ListItemDecorator><TableViewIcon /></ListItemDecorator>
+                <ListItemContent>
+                    <Typography level="title-sm">{account.accountName}</Typography>
+                    <Typography level="body-sm" noWrap>
+                        {FormatCAD(account.balance)}
+                    </Typography>
+                </ListItemContent>
+
+                <KeyboardArrowRightIcon />
+            </ListItemButton>
+        </ListItem>;
+    });
+
     const toastMarkup = toastMessage ? (
-        <Toast content={toastMessage} onDismiss={() => { setToastMessage(null) }} duration={2000} />
+        <Snackbar open={true} >
+            toastMessage
+        </Snackbar>
     ) : null;
 
-    return (<Frame>
-        {toastMarkup}
-        <Card>
-            <ResourceList
-                items={accounts}
-                renderItem={renderItem}
-            />
-        </Card>
-    </Frame>);
+    return (
+        <>
+            {toastMarkup}
+            <Card>
+                <List>
+                    {accountItems}
+                </List>
+            </Card>
+        </>
+    );
 };
 
 export default Accounts;

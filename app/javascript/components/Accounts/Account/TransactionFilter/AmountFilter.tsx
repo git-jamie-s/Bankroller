@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
-import { BlockStack, Checkbox, LegacyStack, TextField } from '@shopify/polaris';
 import { StateOption } from "../../../../helpers/useFilterState";
 import debounce from "lodash.debounce";
+import { Checkbox, Input, Stack } from "@mui/joy";
 
 export interface AmountLimit {
     low: number | undefined,
@@ -32,7 +32,8 @@ export const AmountFilter: React.FC<Props> = ({ amountLimit }) => {
             DEBOUNCE_TIME)
     ).current;
 
-    const setLocalLowDebounce = (val) => {
+    const setLocalLowDebounce = (event) => {
+        const val = event.target.value;
         const low = val === "" ? undefined : parseInt(val);
         const al = { ...locals, low };
         setLocals(al);
@@ -56,21 +57,26 @@ export const AmountFilter: React.FC<Props> = ({ amountLimit }) => {
     const localHigh = locals.high?.toString() || "";
 
     return (
-        <BlockStack>
-            <TextField label="Minimum value"
+        <Stack direction="row" sx={{ alignItems: "center" }}>
+            <span>&nbsp;Amount:</span>
+            <Input
+                sx={{ maxWidth: "10em" }}
+                size="sm"
                 type="number"
                 value={localLow}
-                autoComplete="off"
                 onChange={setLocalLowDebounce}
+                placeholder="Low"
             />
-            <TextField label="Maximum value"
+            <Input
+                sx={{ maxWidth: "10em" }}
+                size="sm"
                 type="number"
                 value={localHigh}
-                autoComplete="off"
                 onChange={setLocalHighDebounce}
+                placeholder="High"
             />
             <Checkbox label="ABS" checked={locals.abs} onChange={changeAbs} />
-        </BlockStack>
+        </Stack>
     );
 
 }
