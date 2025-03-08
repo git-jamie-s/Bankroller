@@ -1,24 +1,24 @@
 import React, { useState } from "react";
-import { Button, Frame, IndexTable, SkeletonPage, Toast, useIndexResourceState } from "@shopify/polaris";
-import { NonEmptyArray } from "@shopify/polaris/build/ts/src/types";
-import { IndexTableHeading } from "@shopify/polaris/build/ts/src/components/IndexTable";
-import { ArrowUpIcon, ArrowDownIcon, DeleteIcon, EditIcon } from '@shopify/polaris-icons';
 import { FormatCAD } from "../../helpers/Formatter";
 import { StateOption, useFilterState } from "../../helpers/useFilterState";
 import { ImportRuleEditDialog } from "./ImportRuleEdit/ImportRuleEditDialog";
 import { ImportRuleType } from "../../graphql/Types";
 import { GMUpsertImportRule } from "../../graphql/GMUpsertImportRule";
 import { GMDeleteImportRule } from "../../graphql/GMDeleteImportRule";
+import { CircularProgress, IconButton, Snackbar, Table } from "@mui/joy";
+import { DeleteForever, Edit } from '@mui/icons-material';
+import SortTableHead from "../../helpers/SortTableHead";
 
 interface Props {
     loading?: boolean;
     sorting: StateOption<string>;
     importRuleArray: ImportRuleType[];
-    paginationInfo: any;
+    paginator: React.ReactElement;
 }
 
-export const ImportRulesList: React.FC<Props> = ({ loading, sorting, importRuleArray, paginationInfo }) => {
+export const ImportRulesList: React.FC<Props> = ({ loading, sorting, importRuleArray, paginator }) => {
     const desc = sorting.current.includes(" desc");
+    const sortCol = sorting.current.split(" ")[0];
 
     const [deleteImportRule, { data: deleteData, error: deleteError }] = GMDeleteImportRule();
     const [upsertImportRule, { data: updateData, error: updateError }] = GMUpsertImportRule();
@@ -34,24 +34,13 @@ export const ImportRulesList: React.FC<Props> = ({ loading, sorting, importRuleA
         sorting.setter(newSortVal);
     }
 
-    const dirIcon = desc ? ArrowDownIcon : ArrowUpIcon;
-    function titleButton(label: string, sortVal: string) {
-        const icon = (sorting.current.startsWith(sortVal)) ? dirIcon : undefined;
-        return <Button variant="tertiary"
-            fullWidth
-            textAlign="left"
-            icon={icon}
-            onClick={() => handleSortClick(sortVal)}>{label}
-        </Button>;
-    }
-
-    const headings: NonEmptyArray<IndexTableHeading> = [
-        { id: "buttons", title: "" },
-        { id: 'description', title: titleButton("Description", "description") },
-        { id: 'type', title: titleButton("Type", "transaction_type") },
-        { id: 'amount', title: titleButton("Amount", "amount") },
-        { id: 'account', title: titleButton("Account", "account.account_name") },
-        { id: 'category', title: titleButton("Category to set", "category_id") },
+    const headings: any[] = [
+        { id: "buttons", label: "", nosort: true },
+        { id: 'description', label: "Description" },
+        { id: 'type', label: "Type" },
+        { id: 'amount', label: "Amount" },
+        { id: 'account.account_name', label: "Account" },
+        { id: 'category_id', label: "Category" },
     ];
 
     const onDelete = (id) => {
@@ -88,26 +77,25 @@ export const ImportRulesList: React.FC<Props> = ({ loading, sorting, importRuleA
             const amount = autoTransaction.amount && FormatCAD(autoTransaction.amount);
             const accountName = autoTransaction.account?.accountName;
             return (
-                <IndexTable.Row
-                    id={autoTransaction.id}
-                    key={autoTransaction.id}
-                    position={index}>
-                    <IndexTable.Cell>
-                        <Button icon={DeleteIcon} onClick={() => onDelete(autoTransaction.id)} />
-                        <Button icon={EditIcon} onClick={() => onEdit(autoTransaction)} />
-                    </IndexTable.Cell>
-                    <IndexTable.Cell>{autoTransaction.description}</IndexTable.Cell>
-                    <IndexTable.Cell>{autoTransaction.transactionType}</IndexTable.Cell>
-                    <IndexTable.Cell>{amount}</IndexTable.Cell>
-                    <IndexTable.Cell>{accountName}</IndexTable.Cell>
-                    <IndexTable.Cell>{autoTransaction.categoryId}</IndexTable.Cell>
-                </IndexTable.Row>
+                <tr key={index}>
+                    <td>
+                        <IconButton onClick={() => onDelete(autoTransaction.id)} ><DeleteForever /></IconButton>
+                        <IconButton onClick={() => onEdit(autoTransaction)} ><Edit /></IconButton>
+                    </td>
+                    <td>{autoTransaction.description}</td>
+                    <td>{autoTransaction.transactionType}</td>
+                    <td>{amount}</td>
+                    <td>{accountName}</td>
+                    <td>{autoTransaction.categoryId}</td>
+                </tr>
             )
         }
     );
 
     const toastMarkup = toastMessage ? (
-        <Toast content={toastMessage} onDismiss={() => { setToastMessage(null) }} duration={2000} />
+        <Snackbar
+            open={true}
+            onClose={() => setToastMessage(null)} >{toastMessage}</Snackbar>
     ) : null;
 
     const editorMarkup = editingImportRule.current &&
@@ -117,23 +105,36 @@ export const ImportRulesList: React.FC<Props> = ({ loading, sorting, importRuleA
             onSave={handleSave} />;
 
     if (loading) {
-        return <SkeletonPage />;
+        return <CircularProgress />;
     }
 
     return (
-        <Frame>
-            <IndexTable
-                headings={headings}
-                itemCount={importRuleArray.length}
-                selectable={false}
-                hasZebraStriping
-                pagination={paginationInfo}
-            >
-                {rowMarkup}
-            </IndexTable>
+        <>
+            <Table
+                size="sm"
+                stickyHeader
+                stickyFooter>
+                <SortTableHead
+                    headCells={headings}
+                    onRequestSort={handleSortClick}
+                    order={desc ? "desc" : "asc"}
+                    orderBy={sortCol}
+                />
+                <tbody>
+                    {rowMarkup}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colSpan={headings.length}>
+                            {paginator}
+                        </td>
+                    </tr>
+                </tfoot>
+
+            </Table>
             {toastMarkup}
             {editorMarkup}
-        </Frame>
+        </>
     );
 
 };

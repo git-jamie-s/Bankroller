@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { Card, Modal, Select, TextField, Button, InlineStack } from '@shopify/polaris';
+import React from "react";
 import { GQTransactionTypes } from "../../../graphql/GQTransactionTypes";
-import { TransactionEditCategory } from "./TransactionEditCategory";
 import { StateOption } from "../../../helpers/useFilterState";
 import { ImportRuleEditAccount } from "./ImportRuleEditAccount";
 import { ImportRuleType } from "../../../graphql/Types";
+import { FormControl, FormLabel, Input, Modal, ModalClose, ModalDialog, Select, Option, Stack, Button } from "@mui/joy";
+import { TransactionEditCategory } from "./TransactionEditCategory";
 
 interface Props {
     importRule: StateOption<ImportRuleType | null>;
@@ -20,10 +20,9 @@ export const ImportRuleEditDialog: React.FC<Props> = ({ importRule, onSave, onCl
     const { transactionTypeData } = GQTransactionTypes();
 
     const ttOptions = transactionTypeData?.transactionTypes
-        .filter((tt) => tt !== "LEDGER")
-        .map((tt) => { return { label: tt, value: tt } }) || [];
+        .map((tt, index) => <Option key={index} value={tt}>{tt}</Option>) || [];
 
-    ttOptions.unshift({ label: "(any)", value: "" })
+    ttOptions.unshift(<Option key="(any)" value="">(any)</Option>);
 
     function setValue(value) {
         const newAutoTran = { ...importRule.current, ...value };
@@ -31,8 +30,12 @@ export const ImportRuleEditDialog: React.FC<Props> = ({ importRule, onSave, onCl
     }
 
     const onChangeDescription = (description) => { setValue({ description }) };
-    const onSetTransactionType = (transactionType) => { setValue({ transactionType }) };
-    const onChangeAmount = (amount) => {
+    const onSetTransactionType = (event, transactionType) => {
+        console.log(event.target.value);
+        setValue({ transactionType });
+    };
+    const onChangeAmount = (event) => {
+        const amount = event.target.value;
         var re = /[-]?\d*\.?\d{0,2}/;
         const filtered = (amount.match(re) || []).join('');
         setValue({ amount: Number(filtered) * 100 })
@@ -41,38 +44,46 @@ export const ImportRuleEditDialog: React.FC<Props> = ({ importRule, onSave, onCl
         return null;
     }
 
-    return <Modal open={true} title={title} onClose={onClose}>
-        <Card>
-            <TextField
-                label="Description (use * for wildcard matching)"
-                value={importRule.current.description}
-                onChange={onChangeDescription}
-                autoComplete="off"
-            />
-            <Select
-                options={ttOptions}
-                label="Transaction Type"
-                value={importRule.current.transactionType || ""}
-                onChange={onSetTransactionType}
-            />
-            <TransactionEditCategory transaction={importRule as StateOption<ImportRuleType>} />
-            <TextField
-                clearButton
-                label="Amount"
-                type="currency"
-                autoComplete="off"
-                onChange={onChangeAmount}
-                onClearButtonClick={() => { onChangeAmount("") }}
-                value={strAmount}
-            />
-            <ImportRuleEditAccount importRule={importRule} />
-        </Card>
-        <Card>
-            <InlineStack align="center" gap="025">
-                <Button onClick={onClose}>Cancel</Button>
-                <Button onClick={() => onSave(true)}>Save And Apply</Button>
-                <Button variant="primary" onClick={() => onSave(false)}>Save</Button>
-            </InlineStack>
-        </Card>
-    </Modal >;
+    return (
+        <>
+            <Modal open={true} title={title} onClose={onClose}>
+                <ModalDialog>
+                    <ModalClose />
+                    <FormControl>
+                        <FormLabel>Description (use * for wildcard matching)</FormLabel>
+                        <Input
+                            value={importRule.current.description}
+                            onChange={onChangeDescription}
+                        />
+                    </FormControl>
+                    <FormControl>
+                        <FormLabel>Transaction Type</FormLabel>
+                        <Select
+                            value={importRule.current.transactionType || ""}
+                            onChange={onSetTransactionType}
+                        >
+                            {ttOptions}
+                        </Select>
+                    </FormControl>
+                    <TransactionEditCategory transaction={importRule as StateOption<ImportRuleType>} />
+                    <FormControl>
+                        <FormLabel>Amount</FormLabel>
+                        <Input
+                            onChange={onChangeAmount}
+                            value={strAmount}
+                        />
+                    </FormControl>
+                    <FormControl>
+                        <FormLabel>Account</FormLabel>
+                        <ImportRuleEditAccount importRule={importRule} />
+                    </FormControl>
+                    <Stack direction="row" spacing="2px">
+                        <Button color="neutral" onClick={onClose}>Cancel</Button>
+                        <Button color="neutral" onClick={() => onSave(true)}>Save And Apply</Button>
+                        <Button color="primary" onClick={() => onSave(false)}>Save</Button>
+                    </Stack>
+                </ModalDialog>
+            </Modal >
+        </>
+    );
 };

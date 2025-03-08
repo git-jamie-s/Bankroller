@@ -1,6 +1,6 @@
 import React from 'react';
 import { XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import { FormatAmountString, FormatCAD } from '../../../helpers/Formatter';
+import { FormatCAD } from '../../../helpers/Formatter';
 import './SummaryBarChart.css';
 
 interface Props {

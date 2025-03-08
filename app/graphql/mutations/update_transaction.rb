@@ -9,14 +9,16 @@ module Mutations
     def resolve(transaction:)
       record = Transaction.find(transaction.id)
 
+      cat = transaction.category_id
+      unless cat.nil?
+        unless Category.find_by(id: transaction.category_id).present?
+          Category.create(id: cat)
+        end
+      end
 
       hash = transaction.to_h
-      Rails.logger.info("XXX: #{hash}")
-
       if hash[:category_id] == ""
-        Rails.logger.info("XXX Replacing category")
         hash[:category_id] = nil
-        Rails.logger.info("XXX: #{hash}")
       end
       record.update(hash)
       { ok: true }

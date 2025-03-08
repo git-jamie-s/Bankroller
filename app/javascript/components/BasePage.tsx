@@ -1,5 +1,6 @@
 import React from "react";
-import { AppProvider, Page } from "@shopify/polaris";
+import { CssVarsProvider } from '@mui/joy/styles';
+import Sheet from '@mui/joy/Sheet';
 
 type Props = {
     title: string;
@@ -8,27 +9,10 @@ type Props = {
 
 export const BasePage: React.FC<Props> = ({ title, children }) => {
     return (
-        <AppProvider
-            i18n={{
-                Polaris: {
-                    ResourceList: {
-                        sortingLabel: 'Sort by',
-                        defaultItemSingular: 'item',
-                        defaultItemPlural: 'items',
-                        showing: 'Showing {itemsCount} {resource}',
-                        Item: {
-                            viewItem: 'View details for {itemName}',
-                        },
-                    },
-                    Common: {
-                        checkbox: 'checkbox',
-                    },
-                },
-            }}
-        >
-            <Page title={title} fullWidth>
+        <CssVarsProvider>
+            <Sheet variant="outlined">
                 {children}
-            </Page>
-        </AppProvider>
+            </Sheet>
+        </CssVarsProvider>
     );
 };

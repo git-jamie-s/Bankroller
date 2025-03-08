@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { Card, Text, Spinner, InlineStack, TextField } from "@shopify/polaris";
+import React from "react";
 import { GQAnnualSummary } from "../../../graphql/GQAnnualSummary";
 import { SummaryOverviewTable } from "./SummaryOverviewTable";
 import { ExpensesSummaryTable } from "./ExpensesSummaryTable";
-import { StateOption, useFilterState } from "../../../helpers/useFilterState";
+import { useFilterState } from "../../../helpers/useFilterState";
+import { Card, CircularProgress } from "@mui/joy";
 
 export const Summary: React.FC = () => {
     // What is the current year?
@@ -14,17 +14,15 @@ export const Summary: React.FC = () => {
     const { loading, error, annualSummary } = GQAnnualSummary(year.current);
 
     if (loading) {
-        return <Spinner />;
+        return <CircularProgress />;
     }
     if (error) {
         return null;
     }
 
-    const yearCompletion = year.current == currentYear && (<Text as="span">&nbsp;Completion: {(annualSummary.yearPortion * 100).toFixed(2)}%</Text>);
-
     return (
         <Card>
-            <Card>
+            <Card title="Overview">
                 <SummaryOverviewTable summary={annualSummary} year={year} />
             </Card>
             <Card>
