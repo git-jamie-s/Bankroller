@@ -11,7 +11,7 @@ const ReportsButton: React.FC<Props> = ({ isReportsPage }) => {
         <Dropdown>
             <MenuButton
                 startDecorator={<BarChartIcon />}
-                color="success"
+                color="primary"
                 variant="solid"
                 endDecorator={<ArrowDropDownIcon />}
             >
