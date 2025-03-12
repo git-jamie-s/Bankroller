@@ -4,7 +4,7 @@ import { StateOption } from "../../../helpers/useFilterState";
 import { ImportRuleEditAccount } from "./ImportRuleEditAccount";
 import { ImportRuleType } from "../../../graphql/Types";
 import { FormControl, FormLabel, Input, Modal, ModalClose, ModalDialog, Select, Option, Stack, Button } from "@mui/joy";
-import { TransactionEditCategory } from "./TransactionEditCategory";
+import { TransactionCategory } from "../../Accounts/Account/TransactionCategory";
 
 interface Props {
     importRule: StateOption<ImportRuleType | null>;
@@ -33,6 +33,9 @@ export const ImportRuleEditDialog: React.FC<Props> = ({ importRule, onSave, onCl
     const onSetTransactionType = (event, transactionType) => {
         console.log(event.target.value);
         setValue({ transactionType });
+    };
+    const onChangeCategory = (categoryId: string) => {
+        setValue({ categoryId });
     };
     const onChangeAmount = (event) => {
         const amount = event.target.value;
@@ -65,7 +68,9 @@ export const ImportRuleEditDialog: React.FC<Props> = ({ importRule, onSave, onCl
                             {ttOptions}
                         </Select>
                     </FormControl>
-                    <TransactionEditCategory transaction={importRule as StateOption<ImportRuleType>} />
+                    <TransactionCategory
+                        currentCategory={importRule.current.categoryId}
+                        setTransactionCategory={onChangeCategory} />
                     <FormControl>
                         <FormLabel>Amount</FormLabel>
                         <Input

@@ -75,7 +75,6 @@ export const ScheduledTransactionRow: React.FC<Props> = ({ index, scheduledTrans
             <td>{scheduledTransaction.description}</td>
             <td>{scheduledTransaction.transactionType}</td>
             <td>{minAmountCell()}</td>
-            <td>{max_amount}</td>
             <td>{accountName}</td>
             <td>{scheduledTransaction.period}</td>
             <td>{scheduledTransaction.weekendAdjust}</td>

@@ -9,7 +9,7 @@ export interface HeadCell {
   id: string;
   label: string;
   sort?: boolean | undefined;
-  width?: string | undefined;
+  style?: any;
 }
 
 interface SortTableHeadProps {
@@ -26,60 +26,63 @@ const SortTableHead: React.FC<SortTableHeadProps> = (props) => {
       onRequestSort(id);
     };
 
+  const ths = headCells.map((headCell) => {
+    const active = orderBy === headCell.id;
+    const sortable = headCell.sort === undefined ? true : headCell.sort;
+    const body = sortable ?
+      <Link
+        underline="none"
+        color="neutral"
+        textColor={active ? 'primary.plainColor' : undefined}
+        component="button"
+        onClick={createSortHandler(headCell.id)}
+
+        endDecorator={
+          <ArrowDownwardIcon
+            sx={[active ? { opacity: 1 } : { opacity: 0 }]}
+          />
+        }
+        sx={{
+          fontWeight: 'lg',
+
+          '& svg': {
+            transition: '0.2s',
+            transform:
+              active && order === 'desc' ? 'rotate(0deg)' : 'rotate(180deg)',
+          },
+
+          '&:hover': { '& svg': { opacity: 1 } },
+        }}
+      >
+        {headCell.label}
+        {active ? (
+          <Box component="span" sx={visuallyHidden}>
+            {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+          </Box>
+        ) : null}
+      </Link>
+      :
+      headCell.label;
+
+    return (
+      <th
+        style={headCell.style}
+        key={headCell.id}
+        aria-sort={
+          active
+            ? ({ asc: 'ascending', desc: 'descending' } as const)[order]
+            : undefined
+        }
+      >
+        {body}
+      </th>
+    );
+  });
+
   return (
     <thead>
       <tr>
-        {headCells.map((headCell) => {
-          const active = orderBy === headCell.id;
-          const sortable = headCell.sort === undefined ? true : headCell.sort;
-          const body = sortable ?
-            <Link
-              underline="none"
-              color="neutral"
-              textColor={active ? 'primary.plainColor' : undefined}
-              component="button"
-              onClick={createSortHandler(headCell.id)}
-
-              endDecorator={
-                <ArrowDownwardIcon
-                  sx={[active ? { opacity: 1 } : { opacity: 0 }]}
-                />
-              }
-              sx={{
-                fontWeight: 'lg',
-
-                '& svg': {
-                  transition: '0.2s',
-                  transform:
-                    active && order === 'desc' ? 'rotate(0deg)' : 'rotate(180deg)',
-                },
-
-                '&:hover': { '& svg': { opacity: 1 } },
-              }}
-            >
-              {headCell.label}
-              {active ? (
-                <Box component="span" sx={visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                </Box>
-              ) : null}
-            </Link>
-            :
-            headCell.label;
-
-          return (
-            <th
-              key={headCell.id}
-              aria-sort={
-                active
-                  ? ({ asc: 'ascending', desc: 'descending' } as const)[order]
-                  : undefined
-              }
-            >
-              {body}
-            </th>
-          );
-        })}
+        {ths}
       </tr>
     </thead>
   );

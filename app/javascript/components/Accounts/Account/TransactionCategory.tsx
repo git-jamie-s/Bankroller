@@ -5,9 +5,10 @@ import { Autocomplete } from "@mui/joy";
 interface Props {
     currentCategory: string | undefined;
     setTransactionCategory(category: string);
+    freeSolo?: boolean;
 }
 
-export const TransactionCategory: React.FC<Props> = ({ currentCategory, setTransactionCategory }) => {
+export const TransactionCategory: React.FC<Props> = ({ currentCategory, setTransactionCategory, freeSolo = false }) => {
     const { categoriesData } = GQCategories();
     const allOptions = categoriesData?.categories.map((c) => c.id) || [];
 
@@ -17,7 +18,7 @@ export const TransactionCategory: React.FC<Props> = ({ currentCategory, setTrans
 
     return (
         <Autocomplete
-            freeSolo
+            freeSolo={freeSolo}
             size="sm"
             sx={{ backgroundColor: "transparent" }}
             options={allOptions}
@@ -26,5 +27,4 @@ export const TransactionCategory: React.FC<Props> = ({ currentCategory, setTrans
             placeholder="Category..."
         />
     );
-
 };

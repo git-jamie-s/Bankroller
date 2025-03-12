@@ -5,7 +5,7 @@ import { useFilterState } from "../../helpers/useFilterState";
 import { AmountLimit } from "../Accounts/Account/TransactionFilter/AmountFilter";
 import { PageInfo, PaginationQueryParams } from "../../graphql/PaginationType";
 import { ImportRulesList } from "./ImportRuleList";
-import { Typography } from "@mui/joy";
+import { Card, Typography } from "@mui/joy";
 import Paginator from "../Accounts/Account/Paginator";
 
 export const ImportRulesPage: React.FC = () => {
@@ -55,20 +55,21 @@ export const ImportRulesPage: React.FC = () => {
 
     const array = importRules?.edges.map((edge) => edge.node) || [];
 
-    return (<>
-        <Typography>Import Rules</Typography>
-        <br />
-        <TransactionFilter
-            query={query}
-            category={category}
-            transactionTypes={transactionTypes}
-            amountLimit={amountLimit} />
-        <ImportRulesList
-            loading={loading}
-            sorting={sorting}
-            importRuleArray={array}
-            paginator={paginator} />
-    </>);
+    return (
+        <Card>
+            <Typography>Import Rules</Typography>
+            <TransactionFilter
+                query={query}
+                category={category}
+                transactionTypes={transactionTypes}
+                amountLimit={amountLimit} />
+            <ImportRulesList
+                loading={loading}
+                sorting={sorting}
+                importRuleArray={array}
+                paginator={paginator} />
+        </Card>
+    );
 };
 
 export default ImportRulesPage;

@@ -7,7 +7,7 @@ import { GMUpsertImportRule } from "../../graphql/GMUpsertImportRule";
 import { GMDeleteImportRule } from "../../graphql/GMDeleteImportRule";
 import { CircularProgress, IconButton, Snackbar, Table } from "@mui/joy";
 import { DeleteForever, Edit } from '@mui/icons-material';
-import SortTableHead from "../../helpers/SortTableHead";
+import SortTableHead, { HeadCell } from "../../helpers/SortTableHead";
 
 interface Props {
     loading?: boolean;
@@ -34,12 +34,13 @@ export const ImportRulesList: React.FC<Props> = ({ loading, sorting, importRuleA
         sorting.setter(newSortVal);
     }
 
-    const headings: any[] = [
-        { id: "buttons", label: "", nosort: true },
+    const tinycol = { width: "20px", whiteSpace: "nowrap" };
+    const headings: HeadCell[] = [
+        { id: "buttons", label: "", sort: false, style: { width: "80px" } },
         { id: 'description', label: "Description" },
-        { id: 'type', label: "Type" },
+        { id: 'transaction_type', label: "Type", style: { width: "8em" } },
         { id: 'amount', label: "Amount" },
-        { id: 'account.account_name', label: "Account" },
+        { id: 'account.account_name', label: "Account", style: { width: "10em" } },
         { id: 'category_id', label: "Category" },
     ];
 

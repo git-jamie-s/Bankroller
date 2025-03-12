@@ -4,7 +4,7 @@ import { ScheduledTransactionType } from "../../graphql/Types";
 import { ScheduledTransactionRow } from "./ScheduledTransactionRow";
 import { GMUpdateScheduledTransaction } from "../../graphql/GMUpdateScheduledTransaction";
 import { CircularProgress, Snackbar, Table } from "@mui/joy";
-import SortTableHead from "../../helpers/SortTableHead";
+import SortTableHead, { HeadCell } from "../../helpers/SortTableHead";
 
 interface Props {
     loading?: boolean;
@@ -61,16 +61,15 @@ export const ScheduledTransactionsList: React.FC<Props> = ({ loading, sorting, s
         sorting.setter(newSortVal);
     }
 
-    const headings = [
-        { id: "buttons", label: "", nosort: true },
-        { id: 'description', label: "Description" },
-        { id: 'type', label: "Transaction Type" },
-        { id: 'min_amount', label: "Min amount" },
-        { id: 'max_amount', label: "Max amount" },
+    const headings: HeadCell[] = [
+        { id: "buttons", label: "", sort: false, width: "2%" },
+        { id: 'description', label: "Description", width: "30%" },
+        { id: 'transaction_type', label: "Transaction Type" },
+        { id: 'min_amount', label: "Amount" },
         { id: 'account.account_name', label: "Account" },
-        { id: 'schedule', label: "Schedule", nosort: true },
-        { id: 'w_a', label: "Weekend Adjust", nosort: true },
-        { id: 'startDate', label: "Start Date", nosort: true },
+        { id: 'schedule', label: "Schedule", sort: false },
+        { id: 'w_a', label: "Weekend Adjust", sort: false },
+        { id: 'startDate', label: "Start Date", sort: false },
     ];
 
     const rowMarkup = array.map(

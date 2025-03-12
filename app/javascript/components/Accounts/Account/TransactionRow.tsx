@@ -89,7 +89,7 @@ export const TransactionRow: React.FC<Props> = ({ index,
             <td>{transaction.date.toString()}</td>
             <td>{transaction.transactionType}</td>
             <td><TransactionDescription transaction={transaction} editing={editingDescription} /></td>
-            <td><TransactionCategory currentCategory={transaction.categoryId} setTransactionCategory={setCategory} /></td>
+            <td><TransactionCategory freeSolo currentCategory={transaction.categoryId} setTransactionCategory={setCategory} /></td>
             <td>{amount}</td>
             {balanceCell}
         </tr>
