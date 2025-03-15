@@ -62,8 +62,8 @@ export const ScheduledTransactionsList: React.FC<Props> = ({ loading, sorting, s
     }
 
     const headings: HeadCell[] = [
-        { id: "buttons", label: "", sort: false, width: "2%" },
-        { id: 'description', label: "Description", width: "30%" },
+        { id: "buttons", label: "", sort: false, style: { width: "1%", wordWrap: false } },
+        { id: 'description', label: "Description", style: { width: "30%" } },
         { id: 'transaction_type', label: "Transaction Type" },
         { id: 'min_amount', label: "Amount" },
         { id: 'account.account_name', label: "Account" },

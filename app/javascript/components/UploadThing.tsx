@@ -1,7 +1,8 @@
+import { Button, Card, FormControl, FormLabel, IconButton, Input, LinearProgress, List, ListItem, Modal, ModalClose, ModalDialog, Typography } from "@mui/joy";
 import React from "react";
-import { Button, Card, DropZone, Link, List, Modal, ProgressBar, Text } from '@shopify/polaris';
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom'
+import FileUploadIcon from '@mui/icons-material/FileUpload';
 
 interface UploadResponse {
     status: string;
@@ -26,13 +27,20 @@ export const UploadThing: React.FC<Props> = ({ reload }) => {
     const [status, setStatus] = useState<UploadResponse | null>(null);
     const navigate = useNavigate()
 
-    const handleDropZoneDrop = useCallback(
-        (_dropFiles: File[], acceptedFiles: File[], _rejectedFiles: File[]) =>
-            setFile(acceptedFiles[0]),
-        [],
-    );
+    const fileInput = React.useRef<HTMLInputElement>(null);
+    const [dragg, setDragg] = useState<boolean>(false);
 
-    const fileUpload = !file && <DropZone.FileUpload />;
+    const handleDrop = (event) => {
+        event.preventDefault();
+        const droppedFiles = event.dataTransfer.files;
+        if (droppedFiles.length > 0) {
+            const newFiles = Array.from(droppedFiles);
+            setFile(newFiles[0] as File);
+        }
+        setDragg(false);
+    };
+
+    // const fileUpload = !file && <DropZone.FileUpload />;
 
     if (file && !started) {
         const csrfToken = document.querySelector('meta[name=csrf-token]')?.getAttribute('content') || '';
@@ -79,27 +87,27 @@ export const UploadThing: React.FC<Props> = ({ reload }) => {
         if (status.transactions) {
             const skipped = status.transactions - status.saved!;
             if (status.account_new === true) {
-                listItems.push(<List.Item>New Account Created: {status.account_name}</List.Item>);
+                listItems.push(<ListItem>New Account Created: {status.account_name}</ListItem>);
             } else {
-                listItems.push(<List.Item>Account: {status.account_name}</List.Item>);
+                listItems.push(<ListItem>Account: {status.account_name}</ListItem>);
             }
-            listItems.push(<List.Item>{status.transactions} transactions processed.</List.Item>);
-            listItems.push(<List.Item>{status.saved} transactions saved, {skipped} skipped</List.Item>);
-            listItems.push(<List.Item>{status.categorized} transactions categorized</List.Item>);
+            listItems.push(<ListItem>{status.transactions} transactions processed.</ListItem>);
+            listItems.push(<ListItem>{status.saved} transactions saved, {skipped} skipped</ListItem>);
+            listItems.push(<ListItem>{status.categorized} transactions categorized</ListItem>);
         }
 
         return status && (
             <>
-                <Text as="p">Status: {status.status}</Text>
-                {status.message && (<Text as="p">{status.message}</Text>)}
-                <List type="bullet">
+                <Typography component="p">Status: {status.status}</Typography>
+                {status.message && (<Typography component="p">{status.message}</Typography>)}
+                <List>
                     {listItems}
                 </List>
             </>
         )
     };
 
-    const progress = status?.progress && <ProgressBar progress={status.progress} />;
+    const progress = status?.progress && <LinearProgress determinate value={status.progress} />;
 
     const modalPrimary = {
         content: 'Close',
@@ -112,27 +120,33 @@ export const UploadThing: React.FC<Props> = ({ reload }) => {
     }
 
     const uploadModal = file &&
-        <Modal title="File Upload" open={true} onClose={onClose} primaryAction={modalPrimary}>
-            <Card>
+        <Modal open={true} onClose={onClose}>
+            <ModalDialog>
+                <ModalClose />
                 {progress}
                 {statusStuff()}
-            </Card>
+            </ModalDialog>
         </Modal >;
-
 
     return (
         <>
-            <DropZone allowMultiple={false}
-                onDrop={handleDropZoneDrop}
-                dropOnPage={true}
-                labelHidden
-                type="file"
-                outline={false}
-            >
-                {fileUpload}
-            </DropZone>
+            <FormControl>
+                <input ref={fileInput} type="file" hidden id="fileuploader"></input>
+                <Button
+                    onDrop={handleDrop}
+                    onDragOver={(event) => {
+                        event.preventDefault();
+                        setDragg(true);
+                    }}
+                    onDragLeave={() => setDragg(false)}
+                    onClick={() => fileInput.current?.click()}
+                    startDecorator={<FileUploadIcon />}
+                    color={dragg ? "success" : "primary"}
+                >
+                    Upload
+                </Button>
+            </FormControl >
             {uploadModal}
-
         </>
     );
-}
+} 

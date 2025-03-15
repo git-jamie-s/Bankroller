@@ -23,7 +23,7 @@ export const Home: React.FC = () => {
 
     const { accountsData } = GQAccounts();
 
-    const onUploadComplete = (accountId: number | null) => {
+    const onUploadComplete = () => {
         apolloClient.resetStore();
     };
 
@@ -69,7 +69,7 @@ export const Home: React.FC = () => {
 
     return (<>
         <BasePage title="Bankroll">
-            <NavBar />
+            <NavBar reload={onUploadComplete} />
             <Outlet />
         </BasePage>
     </>);

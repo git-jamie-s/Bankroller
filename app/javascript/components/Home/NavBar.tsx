@@ -3,8 +3,13 @@ import React from "react";
 import { Paid, AutoFixHigh, Schedule } from '@mui/icons-material';
 import AccountsButton from "./AccountsButton";
 import ReportsButton from "./ReportsButton";
+import { UploadThing } from "../UploadThing";
 
-const NavBar: React.FC = () => {
+interface Props {
+    reload: () => void;
+};
+
+const NavBar: React.FC<Props> = ({ reload }) => {
     return (
         <Stack direction="row" spacing="4px" className="navbarber">
             <AccountsButton isAccountsPage={false} />
@@ -12,6 +17,7 @@ const NavBar: React.FC = () => {
             <Button startDecorator={<Paid />} component="a" href="/budgets">Budgets</Button>
             <Button startDecorator={<AutoFixHigh />} component="a" href="/rules">Import Rules</Button>
             <Button startDecorator={<Schedule />} component="a" href="/schedule">Scheduled Txns</Button>
+            <UploadThing reload={reload} />
         </Stack>);
 };
 
