@@ -123,6 +123,7 @@ export const UploadThing: React.FC<Props> = ({ reload }) => {
         <Modal open={true} onClose={onClose}>
             <ModalDialog>
                 <ModalClose />
+                <Typography>File Upload</Typography>
                 {progress}
                 {statusStuff()}
             </ModalDialog>
