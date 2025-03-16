@@ -2,7 +2,8 @@ import React from "react";
 import { useParams } from "react-router";
 import { Transactions } from "./Transactions";
 import { GQAccount } from "../../../graphql/GQAccount";
-import { Card } from "@mui/joy";
+import { Card, Typography } from "@mui/joy";
+import AccountTitle from "./AccountTitle";
 
 export const AccountPage: React.FC = () => {
     let params = useParams();
@@ -15,8 +16,14 @@ export const AccountPage: React.FC = () => {
 
     const account = accountData.account;
 
+    const allAccounts = (accountId === "0") && <Typography level="title-lg">All Accounts</Typography>;
+    const accountTitle = account !== null && accountId !== "0" &&
+        <AccountTitle account={account} />;
+
     return (<>
         <Card>
+            {allAccounts}
+            {accountTitle}
             <Transactions account={account} />
         </Card>
     </>);

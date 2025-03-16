@@ -122,14 +122,14 @@ class UploadsController < ApplicationController
     def categorize(transactions)
         count = 0
 
-        auto_transactions = AutoTransaction.all.to_a
+        import_rules = ImportRule.all.to_a
 
         transactions.each do |t|
             best_match = nil
-            auto_transactions.each do |auto_transaction|
-                match_weight = auto_transaction.match?(t)
+            import_rules.each do |import_rule|
+                match_weight = import_rule.match?(t)
                 if match_weight.present?
-                    best_match = auto_transaction if best_match.nil? || match_weight > best_match.match_weight
+                    best_match = import_rule if best_match.nil? || match_weight > best_match.match_weight
                 end
             end
             if best_match.present?
