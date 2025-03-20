@@ -25,7 +25,6 @@ export const UploadThing: React.FC<Props> = ({ reload }) => {
     const [file, setFile] = useState<File | null>(null);
     const [started, setStarted] = useState<boolean>(false);
     const [status, setStatus] = useState<UploadResponse | null>(null);
-    const navigate = useNavigate()
 
     const fileInput = React.useRef<HTMLInputElement>(null);
     const [dragg, setDragg] = useState<boolean>(false);
@@ -40,7 +39,7 @@ export const UploadThing: React.FC<Props> = ({ reload }) => {
         setDragg(false);
     };
 
-    // const fileUpload = !file && <DropZone.FileUpload />;
+    console.log("File: ", file);
 
     if (file && !started) {
         const csrfToken = document.querySelector('meta[name=csrf-token]')?.getAttribute('content') || '';
@@ -78,7 +77,6 @@ export const UploadThing: React.FC<Props> = ({ reload }) => {
     }
 
     const statusStuff = () => {
-
         if (status === null)
             return null;
 
@@ -96,6 +94,8 @@ export const UploadThing: React.FC<Props> = ({ reload }) => {
             listItems.push(<ListItem>{status.categorized} transactions categorized</ListItem>);
         }
 
+        const go = <Button component="a" href={`/accounts/${status?.account_id}`}>Go to account</Button>;
+
         return status && (
             <>
                 <Typography component="p">Status: {status.status}</Typography>
@@ -103,21 +103,12 @@ export const UploadThing: React.FC<Props> = ({ reload }) => {
                 <List>
                     {listItems}
                 </List>
+                {go}
             </>
         )
     };
 
     const progress = status?.progress && <LinearProgress determinate value={status.progress} />;
-
-    const modalPrimary = {
-        content: 'Close',
-        onAction: () => {
-            reload(status?.account_id || null);
-            setFile(null);
-            setStarted(false);
-            navigate("/accounts/" + status?.account_id);
-        },
-    }
 
     const uploadModal = file &&
         <Modal open={true} onClose={onClose}>
@@ -129,10 +120,16 @@ export const UploadThing: React.FC<Props> = ({ reload }) => {
             </ModalDialog>
         </Modal >;
 
+    const onFileChange = (event) => {
+        console.log("On File Change:", event.target)
+        if (event.target.files) {
+            setFile(event.target.files[0]);
+        }
+    }
     return (
         <>
             <FormControl>
-                <input ref={fileInput} type="file" hidden id="fileuploader"></input>
+                <input ref={fileInput} type="file" hidden id="fileuploader" onChange={onFileChange}></input>
                 <Button
                     onDrop={handleDrop}
                     onDragOver={(event) => {
