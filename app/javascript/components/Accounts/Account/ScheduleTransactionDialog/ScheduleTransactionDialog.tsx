@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { Card, Modal, Button, InlineStack, BlockStack, Select } from '@shopify/polaris';
 import { StateOption } from "../../../../helpers/useFilterState";
 import { PeriodEnum, TransactionType, WeekendAdjustEnum } from "../../../../graphql/Types";
-import { FormatCAD, WeekdayName } from "../../../../helpers/Formatter";
+import { FormatAmountString, FormatCAD, WeekdayName } from "../../../../helpers/Formatter";
+import { Button, FormControl, FormLabel, Input, Modal, ModalClose, ModalDialog, Stack, Typography } from "@mui/joy";
 
 interface Props {
     transaction: StateOption<TransactionType | null>;
@@ -43,44 +43,42 @@ export const ScheduleTransactionDialog: React.FC<Props> = ({ transaction, onSave
         onSave(tx.id, period, weekend);
     }
 
-    return <Modal open={true} title={title} onClose={onClose}>
-        <Card>
-            <BlockStack align="center">
-                <table>
-                    <tr>
-                        <td>Description</td>
-                        <td>{tx.description}</td>
-                    </tr>
-                    <tr>
-                        <td>Type</td>
-                        <td>{tx.transactionType}</td>
-                    </tr>
-                    <tr>
-                        <td>Amount</td>
-                        <td>{FormatCAD(tx.amount)}</td>
-                    </tr>
-                    <tr>
-                        <td>Start Date</td>
-                        <td>{tx.date.toString()} ({WeekdayName(tx.date)})</td>
-                    </tr>
-                    <tr>
-                        <td>Period</td>
-                        <td>
-                            <Select label="" options={periodOptions} value={period} onChange={(v) => setPeriod(v as PeriodEnum)} />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Weekend Adjust</td>
-                        <td><Select label="" options={weekendOptions} value={weekend} onChange={(v) => setWeekend(v as WeekendAdjustEnum)} /></td>
-                    </tr>
-                </table>
-            </BlockStack>
-        </Card>
-        <Card>
-            <InlineStack align="center" gap="025">
-                <Button onClick={onClose}>Cancel</Button>
-                <Button variant="primary" onClick={onClickSave}>Save</Button>
-            </InlineStack>
-        </Card>
-    </Modal >;
+    const startDate: string = tx.date.toString() + " " + WeekdayName(tx.date);
+
+    return <>
+        <Modal open={true} title={title} onClose={onClose}>
+            <ModalDialog>
+                <ModalClose />
+                <FormControl>
+                    <FormLabel>Description</FormLabel>
+                    <Input value={tx.description} disabled variant="plain" />
+                </FormControl>
+                <FormControl>
+                    <FormLabel>Transaction Type</FormLabel>
+                    <Input value={tx.transactionType} disabled variant="plain" />
+                </FormControl>
+                <FormControl>
+                    <FormLabel>Amount</FormLabel>
+                    <Input value={FormatAmountString(tx.amount)} disabled variant="plain" />
+                </FormControl>
+                <FormControl>
+                    <FormLabel>Start Date</FormLabel>
+                    <Input value={startDate} disabled variant="plain" />
+                </FormControl>
+                <FormControl>
+                    <FormLabel>Period</FormLabel>
+                    {/* <Select label="" options={periodOptions} value={period} onChange={(v) => setPeriod(v as PeriodEnum)} /> */}
+                </FormControl>
+                <FormControl>
+                    <FormLabel>Weekend Adjust</FormLabel>
+                    {/* <Select label="" options={weekendOptions} value={weekend} onChange={(v) => setWeekend(v as WeekendAdjustEnum)} /></td> */}
+                </FormControl>
+                <Stack direction="row" spacing="2px" justifyContent="center">
+                    <Button onClick={onClose}>Cancel</Button>
+                    <Button color="primary" onClick={onClickSave}>Save</Button>
+                </Stack>
+            </ModalDialog>
+
+        </Modal >
+    </>;
 };

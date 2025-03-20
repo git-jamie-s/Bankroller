@@ -4,6 +4,9 @@ import { TransactionType } from "../../../graphql/Types";
 import { StateOption } from "../../../helpers/useFilterState";
 import { TransactionDescription } from "./TransactionDescription";
 import { TransactionCategory } from "./TransactionCategory";
+import { AutoFixHigh, Schedule } from '@mui/icons-material';
+import { Stack, IconButton, MenuButton, Dropdown, Menu, MenuItem, ListItemDecorator } from "@mui/joy";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 interface Props {
     index: number;
@@ -26,53 +29,25 @@ export const TransactionRow: React.FC<Props> = ({ index,
     onScheduleTransaction }) => {
     const amount = FormatCAD(transaction.amount);
     const balance = FormatCAD(transaction.balance);
-    const [active, setActive] = React.useState<string | null>(null);
 
-    const popId = `popover-${index}`;
-    const actionItems = [
-        {
-            content: "Create Rule",
-            onAction: () => {
-                setActive(null);
-                onCreateRule(transaction);
-            }
-        },
-        {
-            content: "Schedule",
-            onAction: () => {
-                setActive(null);
-                onScheduleTransaction(transaction);
-            }
-        }
-    ];
-
-    const toggleMenuActive = (id: string) => () => {
-        setActive((activeId) => (activeId !== id ? id : null));
-    };
-
-    // const menu = transaction.categoryId && (
-    //     <Popover
-    //         active={popId === active}
-    //         preferredAlignment="right"
-    //         activator={
-    //             <Button
-    //                 fullWidth={false}
-    //                 size="slim"
-    //                 onClick={toggleMenuActive(popId)}
-    //                 icon={ChevronDownIcon}
-    //                 accessibilityLabel="Account list"
-    //             />
-    //         }
-    //         autofocusTarget="first-node"
-    //         onClose={toggleMenuActive(popId)}
-    //     >
-    //         <ActionList
-    //             actionRole="menuitem"
-    //             items={actionItems}
-    //         />
-    //     </Popover>
-    // );
-
+    const dropdown = <Dropdown>
+        <MenuButton
+            slots={{ root: IconButton }}
+            slotProps={{ root: { variant: 'outlined', color: 'neutral' } }}
+        >
+            <ExpandMoreIcon />
+        </MenuButton>
+        <Menu>
+            <MenuItem onClick={() => onCreateRule(transaction)}>
+                <ListItemDecorator><AutoFixHigh /></ListItemDecorator>
+                Create Import Rule
+            </MenuItem>
+            <MenuItem onClick={() => onScheduleTransaction(transaction)}>
+                <ListItemDecorator><Schedule /></ListItemDecorator>
+                Schedule Transation
+            </MenuItem>
+        </Menu>
+    </Dropdown>;
 
     const accountCell = includeAccount && (
         <td>{transaction.account.accountName}</td>
@@ -81,10 +56,15 @@ export const TransactionRow: React.FC<Props> = ({ index,
         <td>{balance}</td>
     );
 
+    const actions = <Stack direction="row">
+        <IconButton><AutoFixHigh /></IconButton>
+        <IconButton><Schedule /></IconButton>
+    </Stack>
+
     const setCategory = ((v) => setTransactionCategory(transaction.id, v));
     return (
         <tr>
-            <td></td>
+            <td>{dropdown}</td>
             {accountCell}
             <td>{transaction.date.toString()}</td>
             <td>{transaction.transactionType}</td>

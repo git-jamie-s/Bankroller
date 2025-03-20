@@ -79,7 +79,7 @@ export function GQTransactions(order: string,
             before: pagination.before,
             minAmount,
             maxAmount,
-            absAmount: amountLimit.abs
+            absAmount: true
         }
     });
 

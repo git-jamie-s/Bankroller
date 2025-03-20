@@ -8,10 +8,12 @@ import { GMUpdateTransaction } from "../../../graphql/GMUpdateTransaction";
 import { TransactionRow } from "./TransactionRow";
 import { GMUpsertImportRule } from "../../../graphql/GMUpsertImportRule";
 import { GMCreateScheduledTransaction } from "../../../graphql/GMCreateScheduledTransaction";
-import SortTableHead from "../../../helpers/SortTableHead";
+import SortTableHead, { HeadCell } from "../../../helpers/SortTableHead";
 import { Sheet, Snackbar, Table } from "@mui/joy";
 import Paginator from "./Paginator";
 import { TransactionFilter } from "./TransactionFilter/TransactionFilter";
+import { ImportRuleEditDialog } from "../../ImportRules/ImportRuleEdit/ImportRuleEditDialog";
+import { ScheduleTransactionDialog } from "./ScheduleTransactionDialog/ScheduleTransactionDialog";
 
 interface Props {
     account: any;
@@ -74,7 +76,7 @@ export const Transactions: React.FC<Props> = ({ account }) => {
     const query = useFilterState<string>('', resetPagination);
     const category = useFilterState<string>('', resetPagination);
     const transactionTypes = useFilterState([] as string[], resetPagination);
-    const amountLimit = useFilterState<AmountLimit>({ low: undefined, high: undefined, abs: true });
+    const amountLimit = useFilterState<AmountLimit>({ low: undefined, high: undefined });
 
     const pageNumber = useRef<number>(0);
     const pageSize = useRef<number>(50);
@@ -130,11 +132,6 @@ export const Transactions: React.FC<Props> = ({ account }) => {
         }
     );
 
-    const resourceName = {
-        singular: 'transaction',
-        plural: 'transactions',
-    };
-
     const desc = sort.includes(" desc");
 
     const handleSortClick = (sortVal) => {
@@ -146,32 +143,22 @@ export const Transactions: React.FC<Props> = ({ account }) => {
         resetPagination();
     }
 
-    const headings: any[] = [
+    const headings: HeadCell[] = [
         { id: 'date', label: "Date" },
         { id: 'transaction_type', label: "Type" },
-        { id: 'description', label: "Description", width: "25%" },
-        { id: 'category_id', label: "Category", width: "25%" },
+        { id: 'description', label: "Description", style: { width: "25%" } },
+        { id: 'category_id', label: "Category", style: { width: "25%" } },
         { id: 'amount', label: "Amount" },
     ];
 
     if (includeAccount) {
         headings.unshift({ id: 'account', label: "Account", sort: false });
     }
-    headings.unshift({ id: 'actions', label: "" });
+    headings.unshift({ id: 'actions', label: "", style: { width: "40px", wordWrap: false } });
 
     if (includeBalance) {
         headings.push({ id: 'balance', label: "Balance", sort: false });
     }
-    function widths() {
-        const w = {};
-        headings.forEach((h, index) => {
-            if (h.width) {
-                const propName = `& thead th:nth-child(${index + 1})`
-                w[propName] = { width: h.width };
-            }
-        });
-        return w;
-    };
 
     const onNextPage = () => {
         pageNumber.current++;
@@ -219,7 +206,6 @@ export const Transactions: React.FC<Props> = ({ account }) => {
             <Sheet>
                 <Table
                     stripe="even"
-                    sx={widths()}
                     size="sm"
                     stickyHeader
                     stickyFooter
@@ -248,14 +234,14 @@ export const Transactions: React.FC<Props> = ({ account }) => {
                     </tfoot>
                 </Table>
             </Sheet>
-            {/* <ImportRuleEditDialog
+            <ImportRuleEditDialog
                 importRule={createRule}
                 onClose={() => { createRule.setter(null) }}
                 onSave={onSaveNewRule}
             />
             <ScheduleTransactionDialog transaction={createSxTx}
                 onClose={() => createSxTx.setter(null)}
-                onSave={handleScheduleTransaction} /> */}
+                onSave={handleScheduleTransaction} />
             {toastMarkup}
         </>
     );

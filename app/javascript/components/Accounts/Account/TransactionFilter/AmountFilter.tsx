@@ -1,12 +1,11 @@
-import React, { useRef, useState } from "react";
+import React, { } from "react";
 import { StateOption } from "../../../../helpers/useFilterState";
-import debounce from "lodash.debounce";
-import { Checkbox, Input, Stack } from "@mui/joy";
+import { Stack, Typography } from "@mui/joy";
+import DebounceNumberInput from "../../../../helpers/DebounceNumberInput";
 
 export interface AmountLimit {
     low: number | undefined,
     high: number | undefined,
-    abs: boolean;
 }
 
 interface Props {
@@ -15,67 +14,35 @@ interface Props {
 
 export const AmountFilter: React.FC<Props> = ({ amountLimit }) => {
     const DEBOUNCE_TIME = 1000;
+    const MAX = 100000;
 
-    const [locals, setLocals] = useState<AmountLimit>(amountLimit.current);
+    const timerRef = React.useRef<ReturnType<typeof setTimeout>>(undefined);
 
-    const debouncedOnQueryChange = useRef<any>(
-        debounce((nextValue) => {
-            if (nextValue.low && nextValue.high && nextValue.low > nextValue.high) {
-                const al = { low: nextValue.high, high: nextValue.low, abs: nextValue.abs }
-                setLocals(al);
-                amountLimit.setter(al);
-            }
-            else {
-                amountLimit.setter(nextValue);
-            }
-        },
-            DEBOUNCE_TIME)
-    ).current;
-
-    const setLocalLowDebounce = (event) => {
-        const val = event.target.value;
-        const low = val === "" ? undefined : parseInt(val);
-        const al = { ...locals, low };
-        setLocals(al);
-        debouncedOnQueryChange(al);
+    const stringLow = amountLimit.current.low?.toString() || "";
+    const setLow = (v) => {
+        const num = v == "" ? undefined : Number(v);
+        amountLimit.setter({ low: num, high: amountLimit.current.high });
     }
 
-    const setLocalHighDebounce = (val) => {
-        const high = val === "" ? undefined : parseInt(val);
-        const al = { ...locals, high };
-        setLocals(al);
-        debouncedOnQueryChange(al);
+    const stringHigh = amountLimit.current.high?.toString() || "";
+    const setHigh = (v) => {
+        const num = v == "" ? undefined : Number(v);
+        amountLimit.setter({ high: num, low: amountLimit.current.low });
     }
-
-    const changeAbs = (checked) => {
-        const al = { ...amountLimit.current, abs: checked };
-        setLocals(al);
-        debouncedOnQueryChange(al);
-    }
-
-    const localLow = locals.low?.toString() || "";
-    const localHigh = locals.high?.toString() || "";
 
     return (
-        <Stack direction="row" sx={{ alignItems: "center" }}>
-            <span>&nbsp;Amount:</span>
-            <Input
-                sx={{ maxWidth: "10em" }}
-                size="sm"
-                type="number"
-                value={localLow}
-                onChange={setLocalLowDebounce}
-                placeholder="Low"
+        <Stack spacing="2px" alignItems="center" direction="row" sx={{ width: 250, paddingLeft: "5px" }}>
+            <DebounceNumberInput
+                other={{ size: "sm", sx: { width: 90 } }}
+                value={stringLow}
+                onChange={setLow}
             />
-            <Input
-                sx={{ maxWidth: "10em" }}
-                size="sm"
-                type="number"
-                value={localHigh}
-                onChange={setLocalHighDebounce}
-                placeholder="High"
+            <Typography level="body-xs" noWrap>≤ Amount ≤</Typography>
+            <DebounceNumberInput
+                other={{ size: "sm", sx: { width: 90 } }}
+                value={stringHigh}
+                onChange={setHigh}
             />
-            <Checkbox label="ABS" checked={locals.abs} onChange={changeAbs} />
         </Stack>
     );
 

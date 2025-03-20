@@ -30,7 +30,7 @@ const AccountsButton: React.FC<Props> = ({ isAccountsPage }) => {
     return (
         <Dropdown>
             <MenuButton
-                color="primary"
+                color={isAccountsPage ? "success" : "primary"}
                 variant="solid"
                 startDecorator={<AccountBalanceIcon />}
                 endDecorator={<ArrowDropDownIcon />}
