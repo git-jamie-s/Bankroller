@@ -59,7 +59,7 @@ group :development do
 end
 
 
-gem "graphql", "~> 2.4"
+gem "graphql", "~> 2.5"
 gem "graphiql-rails", group: :development
 
 gem "ofx", git: "https://github.com/annacruz/ofx.git", ref: "543c18c"
